@@ -36,11 +36,11 @@ go run .
 ## 빌드
 ```powershell
 go build ./...
-fyne package --target windows --source-dir . --icon assets\app-icon.png --name game-save-backup-manager
-New-Item -ItemType Directory -Force out | Out-Null
-Move-Item -Force game-save-backup-manager.exe out\game-save-backup-manager.exe
+fyne package -os windows
+# 배포용
+fyne package -os windows -release
 ```
 
 ## 산출물/아이콘
-- 실행 파일: `out\game-save-backup-manager.exe`
+- 실행 파일: `game-save-backup-manager.exe` (프로젝트 루트)
 - 아이콘: `assets/app-icon.png`, `assets/app-icon.ico`

@@ -1,5 +1,4 @@
-﻿# Build outputs
-out/
+# Build outputs
 *.exe
 *.dll
 *.so

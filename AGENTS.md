@@ -4,8 +4,9 @@
 새 세션 에이전트가 **빠르게 안전하게 이어서 작업**할 수 있도록, 코드에서 바로 드러나지 않는 의사결정/운영 규칙만 기록한다.
 
 ## 하드 규칙 (중요)
-- exe 산출물은 항상 `out\game-save-backup-manager.exe`.
-- 아이콘 포함 exe 빌드는 `go build`가 아니라 `fyne package --icon assets\app-icon.png` 경로를 사용.
+- exe 산출물은 항상 프로젝트 루트의 `game-save-backup-manager.exe`.
+- 아이콘 포함 exe 빌드는 `FyneApp.toml` 메타데이터를 사용한 `fyne package -os windows` 경로를 사용.
+- 배포용 패키징은 `fyne package -os windows -release`를 기본으로 사용.
 - 메인 창 닫힘 시 `DB 관리` 창도 함께 닫히도록 이미 구현되어 있음(창 라이프사이클 연동).
 - `reg` 경로 해석 규칙은 사용자 합의로 고정:
 - 경로 끝이 `\\`면 키 전체, 아니면 값 단일.
@@ -32,9 +33,8 @@
 
 ## 빌드/검증 절차
 1. `go build ./...`
-2. `fyne package --target windows --source-dir . --icon assets\app-icon.png --name game-save-backup-manager`
-3. `New-Item -ItemType Directory -Force out | Out-Null`
-4. `Move-Item -Force game-save-backup-manager.exe out\game-save-backup-manager.exe`
+2. `fyne package -os windows`
+3. 배포 빌드 시 `fyne package -os windows -release`
 
 ## 환경 특이사항
 - 이 환경은 `go build` 시 캐시 경로 권한 이슈가 자주 발생한다.
