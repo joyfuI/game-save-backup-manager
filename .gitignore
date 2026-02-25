@@ -1,0 +1,19 @@
+﻿# Build outputs
+out/
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Go workspace
+bin/
+
+# App runtime artifacts
+savelocation.db
+backups/
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
