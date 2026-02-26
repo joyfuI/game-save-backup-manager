@@ -455,6 +455,9 @@ func (s *uiState) openSettingsDialog() {
 
 		ubisoftPathEntry.SetText(toSave.UbisoftConnectPath)
 		dialog.ShowInformation("설정", "설정을 저장했습니다.", s.window)
+		if settingsDialog != nil {
+			settingsDialog.Hide()
+		}
 	})
 
 	openManageButton := widget.NewButton("DB 관리", func() {
