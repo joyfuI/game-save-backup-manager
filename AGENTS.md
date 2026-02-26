@@ -39,8 +39,8 @@
 - `zip` 감지: Glob 매치 수 기준.
 - `reg` 감지: 위 경로 규칙으로 키/값 타깃을 판별한 뒤 존재 여부 확인.
 - 세이브 경로 플레이스홀더 규칙:
-  - `[ubisoftconnect-folder]` => 설정의 `Ubisoft Connect 설치 경로`
-  - `[ubisoftconnect-user-id]` => 설정의 `Ubisoft Connect USER ID`
+  - `{{ubisoftconnect-folder}}` => 설정의 `Ubisoft Connect 설치 경로`
+  - `{{ubisoftconnect-user-id}}` => 설정의 `Ubisoft Connect USER ID`
   - 스캔/실제 파일 접근 시에는 플레이스홀더를 설정값으로 치환해 사용
   - ZIP 내부 논리 경로는 플레이스홀더 원문을 유지
   - 치환에 필요한 설정값이 비어 있으면 해당 항목은 미감지로 처리될 수 있음

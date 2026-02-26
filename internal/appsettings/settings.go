@@ -14,8 +14,8 @@ const (
 	defaultUbisoftConnectPathRaw = `%PROGRAMFILES(X86)%\Ubisoft\Ubisoft Game Launcher`
 	keyUbisoftConnectPath        = "ubisoft_connect_path"
 	keyUbisoftConnectUserID      = "ubisoft_connect_user_id"
-	tokenUbisoftConnectFolder    = "[ubisoftconnect-folder]"
-	tokenUbisoftConnectUserID    = "[ubisoftconnect-user-id]"
+	tokenUbisoftConnectFolder    = "{{ubisoftconnect-folder}}"
+	tokenUbisoftConnectUserID    = "{{ubisoftconnect-user-id}}"
 )
 
 type Settings struct {

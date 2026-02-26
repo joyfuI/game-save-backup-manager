@@ -635,8 +635,8 @@ func validateSaveLocationInput(loc model.SaveLocation) error {
 }
 
 func substituteKnownSavePathTokensForValidation(path string) string {
-	resolved := replaceTokenInsensitive(path, "[ubisoftconnect-folder]", `C:\Ubisoft\Ubisoft Game Launcher`)
-	return replaceTokenInsensitive(resolved, "[ubisoftconnect-user-id]", "user-id")
+	resolved := replaceTokenInsensitive(path, "{{ubisoftconnect-folder}}", `C:\Ubisoft\Ubisoft Game Launcher`)
+	return replaceTokenInsensitive(resolved, "{{ubisoftconnect-user-id}}", "user-id")
 }
 
 func replaceTokenInsensitive(input, token, replacement string) string {
