@@ -435,6 +435,14 @@ func (s *uiState) openSettingsDialog() {
 		folderDialog.Show()
 	})
 
+	openManageButton := widget.NewButton("DB 관리", func() {
+		s.openManageWindow()
+	})
+	pathRow := container.NewBorder(nil, nil, nil, openFolderPicker, ubisoftPathEntry)
+	form := widget.NewForm(
+		widget.NewFormItem("Ubisoft Connect USER ID", ubisoftUserIDEntry),
+	)
+
 	var settingsDialog dialog.Dialog
 
 	saveButton := widget.NewButton("저장", func() {
@@ -453,7 +461,6 @@ func (s *uiState) openSettingsDialog() {
 			return
 		}
 
-		ubisoftPathEntry.SetText(toSave.UbisoftConnectPath)
 		dialog.ShowInformation("설정", "설정을 저장했습니다.", s.window)
 		if settingsDialog != nil {
 			settingsDialog.Hide()
@@ -461,47 +468,22 @@ func (s *uiState) openSettingsDialog() {
 	})
 	saveButton.Importance = widget.HighImportance
 
-	openManageButton := widget.NewButton("DB 관리", func() {
-		s.openManageWindow()
-	})
-
 	cancelButton := widget.NewButton("취소", func() {
 		if settingsDialog != nil {
 			settingsDialog.Hide()
 		}
 	})
 
-	pathLabel := widget.NewLabel("Ubisoft Connect 설치 경로")
-	pathRow := container.NewBorder(nil, nil, nil, openFolderPicker, ubisoftPathEntry)
-	pathSection := container.NewVBox()
-	userIDLabel := widget.NewLabel("Ubisoft Connect USER ID")
-	userIDRow := container.NewBorder(nil, nil, userIDLabel, nil, ubisoftUserIDEntry)
-	userIDSection := container.NewVBox()
-	updatePathLayout := func(totalWidth float32) {
-		if totalWidth >= 640 {
-			pathSection.Objects = []fyne.CanvasObject{
-				container.NewBorder(nil, nil, pathLabel, nil, pathRow),
-			}
-			userIDSection.Objects = []fyne.CanvasObject{userIDRow}
-		} else {
-			pathSection.Objects = []fyne.CanvasObject{pathLabel, pathRow}
-			userIDSection.Objects = []fyne.CanvasObject{userIDLabel, ubisoftUserIDEntry}
-		}
-		pathSection.Refresh()
-		userIDSection.Refresh()
-	}
-	updatePathLayout(720)
-
-	buttonRow := container.NewGridWithColumns(2, cancelButton, saveButton)
-	contentBody := container.NewVBox(pathSection, userIDSection, widget.NewSeparator(), openManageButton, buttonRow)
-	content := container.New(&resizeAwareLayout{
-		onResize: func(size fyne.Size) {
-			updatePathLayout(size.Width)
-		},
-	}, contentBody)
+	content := container.NewVBox(
+		widget.NewLabel("Ubisoft Connect 설치 경로"),
+		pathRow,
+		form,
+		openManageButton,
+		container.NewGridWithColumns(2, cancelButton, saveButton),
+	)
 
 	settingsDialog = dialog.NewCustomWithoutButtons("설정", content, s.window)
-	settingsDialog.Resize(fyne.NewSize(720, 240))
+	settingsDialog.Resize(fyne.NewSize(720, 280))
 	settingsDialog.Show()
 }
 
