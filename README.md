@@ -55,8 +55,10 @@ go run .
 ```powershell
 go build ./...
 fyne package -os windows
+git restore -- FyneApp.toml
 # 배포용
 fyne package -os windows -release
+git restore -- FyneApp.toml
 ```
 
 ## 산출물/아이콘

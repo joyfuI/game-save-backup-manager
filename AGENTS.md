@@ -7,6 +7,8 @@
 - exe 산출물은 프로젝트 루트의 `game-save-backup-manager.exe`.
 - Windows 패키징은 `FyneApp.toml` 메타데이터 기반 `fyne package -os windows`를 사용.
 - 배포 패키징은 `fyne package -os windows -release`를 기본으로 사용.
+- `fyne package` 실행 후에는 항상 `git restore -- FyneApp.toml`로 `Build` 자동 증가를 원복한다.
+- `FyneApp.toml`의 `Build` 값 기준은 `1`로 유지한다.
 - `reg` 경로 해석 규칙은 고정:
   - 경로가 `\\`로 끝나면 키 전체 백업/검증 대상.
   - 경로가 `\\`로 끝나지 않으면 마지막 세그먼트를 값 이름으로 간주해 값 단일 백업/검증 대상.
@@ -61,7 +63,9 @@
 ## 빌드/검증 절차
 1. `go build ./...`
 2. `fyne package -os windows`
+   - 직후 `git restore -- FyneApp.toml`
 3. 배포 빌드 시 `fyne package -os windows -release`
+   - 직후 `git restore -- FyneApp.toml`
 
 ## 환경 특이사항
 - 이 환경은 `go build` 시 캐시 경로 권한 이슈가 간헐적으로 발생한다.
