@@ -16,11 +16,13 @@ const (
 
 	keySteamPath            = "steam_path"
 	keySteamUserID          = "steam_userid"
+	keyMicrosoftStoreUserID = "microsoftstore_userid"
 	keyUbisoftConnectPath   = "ubisoft_connect_path"
 	keyUbisoftConnectUserID = "ubisoft_connect_userid"
 
 	tokenSteamPath            = "{{steam-path}}"
 	tokenSteamUserID          = "{{steam-userid}}"
+	tokenMicrosoftStoreUserID = "{{microsoftstore-userid}}"
 	tokenUbisoftConnectPath   = "{{ubisoftconnect-path}}"
 	tokenUbisoftConnectUserID = "{{ubisoftconnect-userid}}"
 )
@@ -28,6 +30,7 @@ const (
 type Settings struct {
 	SteamPath            string
 	SteamUserID          string
+	MicrosoftStoreUserID string
 	UbisoftConnectPath   string
 	UbisoftConnectUserID string
 }
@@ -80,6 +83,8 @@ func Load() (Settings, error) {
 			}
 		case keySteamUserID:
 			settings.SteamUserID = strings.TrimSpace(value)
+		case keyMicrosoftStoreUserID:
+			settings.MicrosoftStoreUserID = strings.TrimSpace(value)
 		case keyUbisoftConnectPath:
 			cleaned := filepath.Clean(strings.TrimSpace(value))
 			if cleaned != "" {
@@ -114,11 +119,13 @@ func Save(settings Settings) error {
 	}
 
 	steamUserIDValue := strings.TrimSpace(settings.SteamUserID)
+	microsoftStoreUserIDValue := strings.TrimSpace(settings.MicrosoftStoreUserID)
 	ubisoftUserIDValue := strings.TrimSpace(settings.UbisoftConnectUserID)
 
-	content := fmt.Sprintf("[settings]\n%s=%s\n%s=%s\n%s=%s\n%s=%s\n",
+	content := fmt.Sprintf("[settings]\n%s=%s\n%s=%s\n%s=%s\n%s=%s\n%s=%s\n",
 		keySteamPath, steamPathValue,
 		keySteamUserID, steamUserIDValue,
+		keyMicrosoftStoreUserID, microsoftStoreUserIDValue,
 		keyUbisoftConnectPath, ubisoftPathValue,
 		keyUbisoftConnectUserID, ubisoftUserIDValue,
 	)
@@ -140,6 +147,7 @@ func EnsureInitialized() error {
 	return Save(Settings{
 		SteamPath:            DefaultSteamPath(),
 		SteamUserID:          "",
+		MicrosoftStoreUserID: "",
 		UbisoftConnectPath:   DefaultUbisoftConnectPath(),
 		UbisoftConnectUserID: "",
 	})
@@ -170,6 +178,13 @@ func resolveSavePathWithSettings(path string, settings Settings) (string, error)
 			return "", fmt.Errorf("steam userid setting is empty")
 		}
 		resolved = replaceTokenInsensitive(resolved, tokenSteamUserID, steamUserID)
+	}
+	if strings.Contains(strings.ToLower(resolved), tokenMicrosoftStoreUserID) {
+		microsoftStoreUserID := strings.TrimSpace(settings.MicrosoftStoreUserID)
+		if microsoftStoreUserID == "" {
+			return "", fmt.Errorf("microsoft store userid setting is empty")
+		}
+		resolved = replaceTokenInsensitive(resolved, tokenMicrosoftStoreUserID, microsoftStoreUserID)
 	}
 
 	if strings.Contains(strings.ToLower(resolved), tokenUbisoftConnectPath) {
