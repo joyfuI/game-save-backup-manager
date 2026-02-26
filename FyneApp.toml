@@ -1,5 +1,5 @@
 [Details]
-Icon = "assets/app-icon.png"
+Icon = "app-icon.png"
 Name = "game-save-backup-manager"
 ID = "com.joyfui.gamesavebackupmanager"
 Build = 1
