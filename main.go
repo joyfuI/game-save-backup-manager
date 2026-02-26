@@ -477,6 +477,7 @@ func (s *uiState) openSettingsDialog() {
 		pathRow,
 		widget.NewLabel("Ubisoft Connect USER ID"),
 		userIDRow,
+		widget.NewSeparator(),
 		openManageButton,
 		container.NewGridWithColumns(2, cancelButton, saveButton),
 	)
