@@ -475,6 +475,22 @@ func (s *uiState) openSettingsDialog() {
 	steamUserIDRow := steamUserIDEntry
 	ubisoftPathRow := container.NewBorder(nil, nil, nil, openUbisoftFolderPicker, ubisoftPathEntry)
 	ubisoftUserIDRow := ubisoftUserIDEntry
+	steamTab := container.NewVBox(
+		widget.NewLabel("Steam 설치 경로"),
+		steamPathRow,
+		widget.NewLabel("Steam USER ID"),
+		steamUserIDRow,
+	)
+	ubisoftTab := container.NewVBox(
+		widget.NewLabel("Ubisoft Connect 설치 경로"),
+		ubisoftPathRow,
+		widget.NewLabel("Ubisoft Connect USER ID"),
+		ubisoftUserIDRow,
+	)
+	tabs := container.NewAppTabs(
+		container.NewTabItem("Steam", steamTab),
+		container.NewTabItem("Ubisoft Connect", ubisoftTab),
+	)
 
 	var settingsDialog dialog.Dialog
 
@@ -515,21 +531,14 @@ func (s *uiState) openSettingsDialog() {
 	})
 
 	content := container.NewVBox(
-		widget.NewLabel("Steam 설치 경로"),
-		steamPathRow,
-		widget.NewLabel("Steam USER ID"),
-		steamUserIDRow,
-		widget.NewLabel("Ubisoft Connect 설치 경로"),
-		ubisoftPathRow,
-		widget.NewLabel("Ubisoft Connect USER ID"),
-		ubisoftUserIDRow,
+		tabs,
 		widget.NewSeparator(),
 		openManageButton,
 		container.NewGridWithColumns(2, cancelButton, saveButton),
 	)
 
 	settingsDialog = dialog.NewCustomWithoutButtons("설정", content, s.window)
-	settingsDialog.Resize(fyne.NewSize(720, 380))
+	settingsDialog.Resize(fyne.NewSize(720, 360))
 	settingsDialog.Show()
 }
 
