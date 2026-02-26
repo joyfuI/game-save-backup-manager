@@ -14,10 +14,12 @@ const (
 	defaultUbisoftConnectPathRaw = `%PROGRAMFILES(X86)%\Ubisoft\Ubisoft Game Launcher`
 	keyUbisoftConnectPath        = "ubisoft_connect_path"
 	keyUbisoftConnectUserID      = "ubisoft_connect_user_id"
+	tokenUbisoftConnectFolder    = "[ubisoftconnect-folder]"
+	tokenUbisoftConnectUserID    = "[ubisoftconnect-user-id]"
 )
 
 type Settings struct {
-	UbisoftConnectPath string
+	UbisoftConnectPath   string
 	UbisoftConnectUserID string
 }
 
@@ -109,8 +111,64 @@ func EnsureInitialized() error {
 	}
 
 	return Save(Settings{
-		UbisoftConnectPath: DefaultUbisoftConnectPath(),
+		UbisoftConnectPath:   DefaultUbisoftConnectPath(),
+		UbisoftConnectUserID: "",
 	})
+}
+
+func ResolveSavePath(path string) (string, error) {
+	settings, err := Load()
+	if err != nil {
+		return "", err
+	}
+	return resolveSavePathWithSettings(path, settings)
+}
+
+func resolveSavePathWithSettings(path string, settings Settings) (string, error) {
+	resolved := path
+
+	if strings.Contains(strings.ToLower(resolved), tokenUbisoftConnectFolder) {
+		folder := strings.TrimSpace(pathutil.ExpandPathVariables(settings.UbisoftConnectPath))
+		if folder == "" {
+			return "", fmt.Errorf("Ubisoft Connect 설치 경로 설정이 비어 있습니다")
+		}
+		resolved = replaceTokenInsensitive(resolved, tokenUbisoftConnectFolder, filepath.Clean(folder))
+	}
+
+	if strings.Contains(strings.ToLower(resolved), tokenUbisoftConnectUserID) {
+		userID := strings.TrimSpace(settings.UbisoftConnectUserID)
+		if userID == "" {
+			return "", fmt.Errorf("Ubisoft Connect USER ID 설정이 비어 있습니다")
+		}
+		resolved = replaceTokenInsensitive(resolved, tokenUbisoftConnectUserID, userID)
+	}
+
+	return pathutil.ExpandPathVariables(resolved), nil
+}
+
+func replaceTokenInsensitive(input, token, replacement string) string {
+	lowerInput := strings.ToLower(input)
+	lowerToken := strings.ToLower(token)
+
+	if !strings.Contains(lowerInput, lowerToken) {
+		return input
+	}
+
+	var builder strings.Builder
+	for {
+		idx := strings.Index(lowerInput, lowerToken)
+		if idx < 0 {
+			builder.WriteString(input)
+			break
+		}
+
+		builder.WriteString(input[:idx])
+		builder.WriteString(replacement)
+		input = input[idx+len(token):]
+		lowerInput = lowerInput[idx+len(token):]
+	}
+
+	return builder.String()
 }
 
 func filePath() (string, error) {

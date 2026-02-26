@@ -8,8 +8,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	"joyfuI/game-save-backup-manager/internal/appsettings"
 	"joyfuI/game-save-backup-manager/internal/model"
-	"joyfuI/game-save-backup-manager/internal/pathutil"
 )
 
 type Result struct {
@@ -20,8 +20,12 @@ type Result struct {
 }
 
 func CreateZipBackup(loc model.SaveLocation, backupDir string) (Result, error) {
-	expandedPath := pathutil.ExpandPathVariables(loc.Path)
-	matches, err := filepath.Glob(expandedPath)
+	resolvedPath, err := appsettings.ResolveSavePath(loc.Path)
+	if err != nil {
+		return Result{}, err
+	}
+
+	matches, err := filepath.Glob(resolvedPath)
 	if err != nil {
 		return Result{}, fmt.Errorf("glob failed: %w", err)
 	}
@@ -44,10 +48,10 @@ func CreateZipBackup(loc model.SaveLocation, backupDir string) (Result, error) {
 
 	zw := zip.NewWriter(zipFile)
 
-	baseRoot := fixedPrefixPath(expandedPath)
+	baseRoot := fixedPrefixPath(resolvedPath)
 	logicalPrefix := fixedPrefixPath(loc.Path)
 	if !hasGlobWildcards(loc.Path) {
-		baseRoot = filepath.Dir(expandedPath)
+		baseRoot = filepath.Dir(resolvedPath)
 		logicalPrefix = filepath.Dir(loc.Path)
 	}
 	written := 0

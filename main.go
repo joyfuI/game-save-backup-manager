@@ -206,7 +206,12 @@ func (s *uiState) openSavePathInExplorer(loc model.SaveLocation) {
 }
 
 func resolveExplorerDirFromGlob(pathPattern string) (string, error) {
-	expanded := strings.TrimSpace(pathutil.ExpandPathVariables(pathPattern))
+	resolvedPath, err := appsettings.ResolveSavePath(pathPattern)
+	if err != nil {
+		return "", err
+	}
+
+	expanded := strings.TrimSpace(resolvedPath)
 	if expanded == "" {
 		return "", fmt.Errorf("세이브 경로가 비어 있습니다")
 	}
@@ -614,7 +619,8 @@ func validateSaveLocationInput(loc model.SaveLocation) error {
 
 	switch strings.ToLower(strings.TrimSpace(loc.Type)) {
 	case "zip":
-		if _, err := filepath.Match(loc.Path, "sample"); err != nil {
+		patternForValidation := substituteKnownSavePathTokensForValidation(loc.Path)
+		if _, err := filepath.Match(patternForValidation, "sample"); err != nil {
 			return fmt.Errorf("Glob 패턴이 잘못되었습니다: %w", err)
 		}
 	case "reg":
@@ -626,6 +632,36 @@ func validateSaveLocationInput(loc model.SaveLocation) error {
 	}
 
 	return nil
+}
+
+func substituteKnownSavePathTokensForValidation(path string) string {
+	resolved := replaceTokenInsensitive(path, "[ubisoftconnect-folder]", `C:\Ubisoft\Ubisoft Game Launcher`)
+	return replaceTokenInsensitive(resolved, "[ubisoftconnect-user-id]", "user-id")
+}
+
+func replaceTokenInsensitive(input, token, replacement string) string {
+	lowerInput := strings.ToLower(input)
+	lowerToken := strings.ToLower(token)
+
+	if !strings.Contains(lowerInput, lowerToken) {
+		return input
+	}
+
+	var builder strings.Builder
+	for {
+		idx := strings.Index(lowerInput, lowerToken)
+		if idx < 0 {
+			builder.WriteString(input)
+			break
+		}
+
+		builder.WriteString(input[:idx])
+		builder.WriteString(replacement)
+		input = input[idx+len(token):]
+		lowerInput = lowerInput[idx+len(token):]
+	}
+
+	return builder.String()
 }
 
 func applyColumnWidthsByRatio(table *widget.Table, baseWidths []float32, totalWidth float32) {
