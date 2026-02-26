@@ -4,9 +4,11 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"net/url"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"strings"
 
 	"fyne.io/fyne/v2"
@@ -14,8 +16,10 @@ import (
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/layout"
+	fynestorage "fyne.io/fyne/v2/storage"
 	"fyne.io/fyne/v2/widget"
 
+	appsettings "joyfuI/game-save-backup-manager/internal/appsettings"
 	"joyfuI/game-save-backup-manager/internal/backup"
 	"joyfuI/game-save-backup-manager/internal/model"
 	"joyfuI/game-save-backup-manager/internal/pathutil"
@@ -381,14 +385,91 @@ func (s *uiState) openManageWindow() {
 }
 
 func (s *uiState) openSettingsDialog() {
+	loaded, err := appsettings.Load()
+	if err != nil {
+		dialog.ShowError(err, s.window)
+		return
+	}
+
+	ubisoftPathEntry := widget.NewEntry()
+	ubisoftPathEntry.SetText(loaded.UbisoftConnectPath)
+
+	openFolderPicker := widget.NewButton("폴더 선택", func() {
+		folderDialog := dialog.NewFolderOpen(func(list fyne.ListableURI, err error) {
+			if err != nil {
+				dialog.ShowError(err, s.window)
+				return
+			}
+			if list == nil {
+				return
+			}
+			chosen := normalizeLocalPathFromURI(list.Path())
+			if strings.TrimSpace(chosen) == "" {
+				return
+			}
+			ubisoftPathEntry.SetText(filepath.Clean(chosen))
+		}, s.window)
+
+		currentPath := strings.TrimSpace(pathutil.ExpandPathVariables(ubisoftPathEntry.Text))
+		if currentPath != "" {
+			if info, statErr := os.Stat(currentPath); statErr == nil && info.IsDir() {
+				if uri := fynestorage.NewFileURI(currentPath); uri != nil {
+					if listable, listErr := fynestorage.ListerForURI(uri); listErr == nil {
+						folderDialog.SetLocation(listable)
+					}
+				}
+			}
+		}
+
+		folderDialog.Show()
+	})
+
+	saveButton := widget.NewButton("저장", func() {
+		path := strings.TrimSpace(pathutil.ExpandPathVariables(ubisoftPathEntry.Text))
+		if path == "" {
+			dialog.ShowError(fmt.Errorf("Ubisoft Connect 설치 경로를 입력해 주세요"), s.window)
+			return
+		}
+
+		toSave := appsettings.Settings{
+			UbisoftConnectPath: filepath.Clean(path),
+		}
+		if err := appsettings.Save(toSave); err != nil {
+			dialog.ShowError(err, s.window)
+			return
+		}
+
+		ubisoftPathEntry.SetText(toSave.UbisoftConnectPath)
+		dialog.ShowInformation("설정", "설정을 저장했습니다.", s.window)
+	})
+
 	openManageButton := widget.NewButton("DB 관리", func() {
 		s.openManageWindow()
 	})
 
-	content := container.NewVBox(openManageButton)
+	pathRow := container.NewBorder(nil, nil, nil, openFolderPicker, ubisoftPathEntry)
+	form := widget.NewForm(
+		widget.NewFormItem("Ubisoft Connect 설치 경로", pathRow),
+	)
+
+	content := container.NewVBox(form, saveButton, widget.NewSeparator(), openManageButton)
 	settingsDialog := dialog.NewCustom("설정", "닫기", content, s.window)
-	settingsDialog.Resize(fyne.NewSize(320, 180))
+	settingsDialog.Resize(fyne.NewSize(720, 240))
 	settingsDialog.Show()
+}
+
+func normalizeLocalPathFromURI(uriPath string) string {
+	decoded, err := url.PathUnescape(uriPath)
+	if err != nil {
+		decoded = uriPath
+	}
+
+	localPath := filepath.FromSlash(decoded)
+	if runtime.GOOS == "windows" && len(localPath) >= 3 && localPath[0] == '\\' && localPath[2] == ':' {
+		localPath = localPath[1:]
+	}
+
+	return localPath
 }
 
 func (s *uiState) openUpsertDialog(parent fyne.Window, existing *model.SaveLocation, onSaved func()) {
