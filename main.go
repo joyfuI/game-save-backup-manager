@@ -83,14 +83,14 @@ func (s *uiState) buildAndRun() {
 	s.mainListBox = container.NewVBox()
 	listScroll := container.NewVScroll(s.mainListBox)
 
-	manageButton := widget.NewButton("DB 관리", func() {
-		s.openManageWindow()
+	settingsButton := widget.NewButton("설정", func() {
+		s.openSettingsDialog()
 	})
 	scanButton := widget.NewButton("스캔", func() {
 		s.refreshScan()
 	})
 
-	topBar := container.NewHBox(scanButton, layout.NewSpacer(), manageButton)
+	topBar := container.NewHBox(scanButton, layout.NewSpacer(), settingsButton)
 	title := widget.NewLabel("감지된 세이브 목록")
 	content := container.NewBorder(topBar, nil, nil, nil, container.NewBorder(title, nil, nil, nil, listScroll))
 
@@ -378,6 +378,17 @@ func (s *uiState) openManageWindow() {
 
 	refreshManage()
 	manageWindow.Show()
+}
+
+func (s *uiState) openSettingsDialog() {
+	openManageButton := widget.NewButton("DB 관리", func() {
+		s.openManageWindow()
+	})
+
+	content := container.NewVBox(openManageButton)
+	settingsDialog := dialog.NewCustom("설정", "닫기", content, s.window)
+	settingsDialog.Resize(fyne.NewSize(320, 180))
+	settingsDialog.Show()
 }
 
 func (s *uiState) openUpsertDialog(parent fyne.Window, existing *model.SaveLocation, onSaved func()) {
