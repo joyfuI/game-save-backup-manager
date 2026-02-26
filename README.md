@@ -5,22 +5,40 @@
 Windows에서 게임 세이브를 `zip` 또는 `reg` 형식으로 백업하는 GUI 도구입니다.
 
 ## 주요 기능
-- 감지된 세이브 목록 표시(설치/존재 확인된 항목만)
+- 감지된 세이브 목록 표시(실제로 세이브 경로가 매치되는 항목만)
+- 각 항목별 `백업`, `경로 열기`
 - `DB 관리` 창에서 등록/수정/삭제
-- `zip` 백업: 파일/폴더 기반 세이브를 ZIP으로 백업
+- `zip` 백업: 파일/폴더 세이브를 ZIP으로 백업
 - `reg` 백업: 레지스트리 키/값을 `.reg` 파일로 백업
 
-## 백업 타입별 경로 규칙
-- `zip`
-  - `path`는 파일 경로 또는 Glob 패턴
-  - `%APPDATA%` 같은 환경변수 사용 가능
-- `reg`
-  - 경로가 `\\`로 끝나면: **키 전체 백업**
-  - 경로가 `\\`로 안 끝나면: **값 단일 백업**(마지막 세그먼트가 값 이름)
+## 설정
+설정 다이얼로그에서 아래 항목을 관리합니다.
+- `Ubisoft Connect 설치 경로`
+- `Ubisoft Connect USER ID`
+
+설정은 실행 파일과 같은 경로의 ini 파일에 저장됩니다.
+- 파일명: `<exe basename>.ini` (예: `game-save-backup-manager.ini`)
+- 키:
+  - `ubisoft_connect_path`
+  - `ubisoft_connect_userid`
+
+## 세이브 경로 플레이스홀더
+`zip` 타입 path에서 아래 플레이스홀더를 사용할 수 있습니다.
+- `{{ubisoftconnect-path}}` => 설정의 Ubisoft Connect 설치 경로
+- `{{ubisoftconnect-userid}}` => 설정의 Ubisoft Connect USER ID
 
 예시:
-- 키 전체: `HKCU\\Software\\MyGame\\`
-- 값 단일: `HKEY_LOCAL_MACHINE\\SOFTWARE\\Disney Interactive\\Hercules\\1.00\\Config`
+- DB path: `{{ubisoftconnect-path}}\savegames\{{ubisoftconnect-userid}}\4\*`
+- 실제 탐색: `C:\Program Files (x86)\Ubisoft\Ubisoft Game Launcher\savegames\12345\4\*`
+
+주의:
+- 스캔/실제 파일 접근은 치환된 실제 경로로 수행됩니다.
+- ZIP 내부 경로는 플레이스홀더 원문을 유지합니다.
+- 필요한 설정값이 비어 있으면 해당 항목은 감지/백업이 실패할 수 있습니다.
+
+## reg 경로 규칙
+- path가 `\\`로 끝나면: 키 전체 백업
+- path가 `\\`로 끝나지 않으면: 마지막 세그먼트를 값 이름으로 간주해 값 단일 백업
 
 ## DB 스키마 (`savelocation`)
 - `name`: 게임 이름
