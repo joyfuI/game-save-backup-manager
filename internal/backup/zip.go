@@ -49,8 +49,9 @@ func CreateZipBackup(loc model.SaveLocation, backupDir string) (Result, error) {
 	zw := zip.NewWriter(zipFile)
 
 	baseRoot := fixedPrefixPath(resolvedPath)
-	logicalPrefix := fixedPrefixPath(loc.Path)
-	if !hasGlobWildcards(loc.Path) {
+	logicalPattern := normalizeLogicalPattern(loc.Path)
+	logicalPrefix := restoreLogicalTokens(fixedPrefixPath(logicalPattern))
+	if !hasGlobWildcards(logicalPattern) {
 		baseRoot = filepath.Dir(resolvedPath)
 		logicalPrefix = filepath.Dir(loc.Path)
 	}
@@ -177,4 +178,39 @@ func archivePath(baseRoot, logicalPrefix, fullPath string) string {
 
 func hasGlobWildcards(path string) bool {
 	return strings.ContainsAny(path, "*?[")
+}
+
+func normalizeLogicalPattern(path string) string {
+	replaced := replaceTokenInsensitive(path, "[ubisoftconnect-folder]", "__UBISOFTCONNECT_FOLDER__")
+	return replaceTokenInsensitive(replaced, "[ubisoftconnect-user-id]", "__UBISOFTCONNECT_USER_ID__")
+}
+
+func restoreLogicalTokens(path string) string {
+	replaced := strings.ReplaceAll(path, "__UBISOFTCONNECT_FOLDER__", "[ubisoftconnect-folder]")
+	return strings.ReplaceAll(replaced, "__UBISOFTCONNECT_USER_ID__", "[ubisoftconnect-user-id]")
+}
+
+func replaceTokenInsensitive(input, token, replacement string) string {
+	lowerInput := strings.ToLower(input)
+	lowerToken := strings.ToLower(token)
+
+	if !strings.Contains(lowerInput, lowerToken) {
+		return input
+	}
+
+	var builder strings.Builder
+	for {
+		idx := strings.Index(lowerInput, lowerToken)
+		if idx < 0 {
+			builder.WriteString(input)
+			break
+		}
+
+		builder.WriteString(input[:idx])
+		builder.WriteString(replacement)
+		input = input[idx+len(token):]
+		lowerInput = lowerInput[idx+len(token):]
+	}
+
+	return builder.String()
 }
