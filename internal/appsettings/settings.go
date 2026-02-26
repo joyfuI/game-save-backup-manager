@@ -84,6 +84,23 @@ func Save(settings Settings) error {
 	return os.WriteFile(filePath, []byte(content), 0644)
 }
 
+func EnsureInitialized() error {
+	filePath, err := filePath()
+	if err != nil {
+		return err
+	}
+
+	if _, err := os.Stat(filePath); err == nil {
+		return nil
+	} else if !os.IsNotExist(err) {
+		return err
+	}
+
+	return Save(Settings{
+		UbisoftConnectPath: DefaultUbisoftConnectPath(),
+	})
+}
+
 func filePath() (string, error) {
 	exePath, err := os.Executable()
 	if err != nil {

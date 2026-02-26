@@ -63,6 +63,10 @@ func (l *resizeAwareLayout) MinSize(objects []fyne.CanvasObject) fyne.Size {
 }
 
 func main() {
+	if err := appsettings.EnsureInitialized(); err != nil {
+		log.Fatalf("failed to initialize settings: %v", err)
+	}
+
 	db, err := storage.OpenAndInit(dbFile)
 	if err != nil {
 		log.Fatalf("failed to open db: %v", err)

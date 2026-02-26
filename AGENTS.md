@@ -46,6 +46,7 @@
 - 기본값(ini 없을 때): `%PROGRAMFILES(X86)%\Ubisoft\Ubisoft Game Launcher`
   - UI 표시 시 환경변수를 실제 경로로 치환한 값 사용
   - 저장 시에도 치환된 실제 경로를 저장
+- 프로그램 시작 시 ini가 없으면 기본값으로 자동 생성한다.
 
 ## 빌드/검증 절차
 1. `go build ./...`
