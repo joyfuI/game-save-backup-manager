@@ -459,6 +459,7 @@ func (s *uiState) openSettingsDialog() {
 			settingsDialog.Hide()
 		}
 	})
+	saveButton.Importance = widget.HighImportance
 
 	openManageButton := widget.NewButton("DB 관리", func() {
 		s.openManageWindow()
