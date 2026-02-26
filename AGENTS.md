@@ -39,8 +39,8 @@
 - `zip` 감지: Glob 매치 수 기준.
 - `reg` 감지: 위 경로 규칙으로 키/값 타깃을 판별한 뒤 존재 여부 확인.
 - 세이브 경로 플레이스홀더 규칙:
-  - `{{ubisoftconnect-folder}}` => 설정의 `Ubisoft Connect 설치 경로`
-  - `{{ubisoftconnect-user-id}}` => 설정의 `Ubisoft Connect USER ID`
+  - `{{ubisoftconnect-path}}` => 설정의 `Ubisoft Connect 설치 경로`
+  - `{{ubisoftconnect-userid}}` => 설정의 `Ubisoft Connect USER ID`
   - 스캔/실제 파일 접근 시에는 플레이스홀더를 설정값으로 치환해 사용
   - ZIP 내부 논리 경로는 플레이스홀더 원문을 유지
   - 치환에 필요한 설정값이 비어 있으면 해당 항목은 미감지로 처리될 수 있음
@@ -50,11 +50,11 @@
 - 파일명: 실행 파일명 기반 (`<exe basename>.ini`)
 - 저장 위치: 실행 파일과 같은 디렉터리
 - 키: `ubisoft_connect_path`
-- 키: `ubisoft_connect_user_id`
+- 키: `ubisoft_connect_userid`
 - 기본값(ini 없을 때): `%PROGRAMFILES(X86)%\Ubisoft\Ubisoft Game Launcher`
   - UI 표시 시 환경변수를 실제 경로로 치환한 값 사용
   - 저장 시에도 치환된 실제 경로를 저장
-- `ubisoft_connect_user_id` 기본값: 빈 문자열
+- `ubisoft_connect_userid` 기본값: 빈 문자열
 - 프로그램 시작 시 ini가 없으면 기본값으로 자동 생성한다.
 
 ## 빌드/검증 절차

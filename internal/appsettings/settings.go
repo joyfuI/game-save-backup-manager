@@ -13,9 +13,9 @@ import (
 const (
 	defaultUbisoftConnectPathRaw = `%PROGRAMFILES(X86)%\Ubisoft\Ubisoft Game Launcher`
 	keyUbisoftConnectPath        = "ubisoft_connect_path"
-	keyUbisoftConnectUserID      = "ubisoft_connect_user_id"
-	tokenUbisoftConnectFolder    = "{{ubisoftconnect-folder}}"
-	tokenUbisoftConnectUserID    = "{{ubisoftconnect-user-id}}"
+	keyUbisoftConnectUserID      = "ubisoft_connect_userid"
+	tokenUbisoftConnectPath      = "{{ubisoftconnect-path}}"
+	tokenUbisoftConnectUserID    = "{{ubisoftconnect-userid}}"
 )
 
 type Settings struct {
@@ -127,12 +127,12 @@ func ResolveSavePath(path string) (string, error) {
 func resolveSavePathWithSettings(path string, settings Settings) (string, error) {
 	resolved := path
 
-	if strings.Contains(strings.ToLower(resolved), tokenUbisoftConnectFolder) {
-		folder := strings.TrimSpace(pathutil.ExpandPathVariables(settings.UbisoftConnectPath))
-		if folder == "" {
+	if strings.Contains(strings.ToLower(resolved), tokenUbisoftConnectPath) {
+		installPath := strings.TrimSpace(pathutil.ExpandPathVariables(settings.UbisoftConnectPath))
+		if installPath == "" {
 			return "", fmt.Errorf("Ubisoft Connect 설치 경로 설정이 비어 있습니다")
 		}
-		resolved = replaceTokenInsensitive(resolved, tokenUbisoftConnectFolder, filepath.Clean(folder))
+		resolved = replaceTokenInsensitive(resolved, tokenUbisoftConnectPath, filepath.Clean(installPath))
 	}
 
 	if strings.Contains(strings.ToLower(resolved), tokenUbisoftConnectUserID) {
