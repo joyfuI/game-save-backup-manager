@@ -439,9 +439,7 @@ func (s *uiState) openSettingsDialog() {
 		s.openManageWindow()
 	})
 	pathRow := container.NewBorder(nil, nil, nil, openFolderPicker, ubisoftPathEntry)
-	form := widget.NewForm(
-		widget.NewFormItem("Ubisoft Connect USER ID", ubisoftUserIDEntry),
-	)
+	userIDRow := ubisoftUserIDEntry
 
 	var settingsDialog dialog.Dialog
 
@@ -477,7 +475,8 @@ func (s *uiState) openSettingsDialog() {
 	content := container.NewVBox(
 		widget.NewLabel("Ubisoft Connect 설치 경로"),
 		pathRow,
-		form,
+		widget.NewLabel("Ubisoft Connect USER ID"),
+		userIDRow,
 		openManageButton,
 		container.NewGridWithColumns(2, cancelButton, saveButton),
 	)
