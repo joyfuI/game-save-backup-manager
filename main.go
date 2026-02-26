@@ -492,7 +492,7 @@ func (s *uiState) openSettingsDialog() {
 	}
 	updatePathLayout(720)
 
-	buttonRow := container.NewGridWithColumns(2, saveButton, cancelButton)
+	buttonRow := container.NewGridWithColumns(2, cancelButton, saveButton)
 	contentBody := container.NewVBox(pathSection, userIDSection, widget.NewSeparator(), openManageButton, buttonRow)
 	content := container.New(&resizeAwareLayout{
 		onResize: func(size fyne.Size) {
@@ -547,7 +547,6 @@ func (s *uiState) openUpsertDialog(parent fyne.Window, existing *model.SaveLocat
 		widget.NewFormItem("백업 파일명", fileNameEntry),
 		widget.NewFormItem("세이브 경로", pathEntry),
 	}
-
 	formDialog := dialog.NewForm(title, "저장", "취소", items, func(ok bool) {
 		if !ok {
 			return
@@ -580,7 +579,6 @@ func (s *uiState) openUpsertDialog(parent fyne.Window, existing *model.SaveLocat
 
 		onSaved()
 	}, parent)
-
 	formDialog.Resize(fyne.NewSize(640, 360))
 	formDialog.Show()
 }
