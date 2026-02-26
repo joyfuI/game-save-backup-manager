@@ -232,7 +232,7 @@ func resolveExplorerDirFromGlob(pathPattern string) (string, error) {
 }
 
 func hasGlobWildcards(path string) bool {
-	return strings.ContainsAny(path, "*?[")
+	return strings.ContainsAny(path, "*?[{")
 }
 
 func fixedPrefixDir(pattern string) string {
@@ -244,7 +244,7 @@ func fixedPrefixDir(pattern string) string {
 	parts := strings.Split(rest, string(filepath.Separator))
 	fixed := make([]string, 0, len(parts))
 	for _, p := range parts {
-		if strings.ContainsAny(p, "*?[") {
+		if strings.ContainsAny(p, "*?[{") {
 			break
 		}
 		fixed = append(fixed, p)

@@ -10,6 +10,7 @@ import (
 
 	"joyfuI/game-save-backup-manager/internal/appsettings"
 	"joyfuI/game-save-backup-manager/internal/model"
+	"joyfuI/game-save-backup-manager/internal/pathutil"
 )
 
 type Result struct {
@@ -25,7 +26,7 @@ func CreateZipBackup(loc model.SaveLocation, backupDir string) (Result, error) {
 		return Result{}, err
 	}
 
-	matches, err := filepath.Glob(resolvedPath)
+	matches, err := pathutil.Glob(resolvedPath)
 	if err != nil {
 		return Result{}, fmt.Errorf("glob failed: %w", err)
 	}
@@ -138,7 +139,7 @@ func fixedPrefixPath(pattern string) string {
 	parts := strings.Split(rest, string(filepath.Separator))
 	fixed := make([]string, 0, len(parts))
 	for _, p := range parts {
-		if strings.ContainsAny(p, "*?[") {
+		if strings.ContainsAny(p, "*?[{") {
 			break
 		}
 		fixed = append(fixed, p)
@@ -177,7 +178,7 @@ func archivePath(baseRoot, logicalPrefix, fullPath string) string {
 }
 
 func hasGlobWildcards(path string) bool {
-	return strings.ContainsAny(path, "*?[")
+	return strings.ContainsAny(path, "*?[{")
 }
 
 func normalizeLogicalPattern(path string) string {

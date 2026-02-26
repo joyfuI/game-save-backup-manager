@@ -1,11 +1,11 @@
 package scan
 
 import (
-	"path/filepath"
 	"strings"
 
 	"joyfuI/game-save-backup-manager/internal/appsettings"
 	"joyfuI/game-save-backup-manager/internal/model"
+	"joyfuI/game-save-backup-manager/internal/pathutil"
 	"joyfuI/game-save-backup-manager/internal/regutil"
 )
 
@@ -36,7 +36,7 @@ func SaveLocations(locations []model.SaveLocation) []model.ScanResult {
 				continue
 			}
 
-			matches, err := filepath.Glob(resolvedPath)
+			matches, err := pathutil.Glob(resolvedPath)
 			if err != nil {
 				results = append(results, model.ScanResult{SaveLocation: loc, Installed: false, Matches: 0})
 				continue
