@@ -61,4 +61,4 @@ fyne package -os windows -release
 
 ## 산출물/아이콘
 - 실행 파일: `game-save-backup-manager.exe` (프로젝트 루트)
-- 아이콘: `assets/app-icon.png`, `assets/app-icon.ico`
+- 아이콘: `app-icon.png`
