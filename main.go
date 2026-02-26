@@ -397,6 +397,8 @@ func (s *uiState) openSettingsDialog() {
 
 	ubisoftPathEntry := widget.NewEntry()
 	ubisoftPathEntry.SetText(loaded.UbisoftConnectPath)
+	ubisoftUserIDEntry := widget.NewEntry()
+	ubisoftUserIDEntry.SetText(loaded.UbisoftConnectUserID)
 
 	openFolderPicker := widget.NewButton("폴더 선택", func() {
 		folderDialog := dialog.NewFolderOpen(func(list fyne.ListableURI, err error) {
@@ -438,7 +440,8 @@ func (s *uiState) openSettingsDialog() {
 		}
 
 		toSave := appsettings.Settings{
-			UbisoftConnectPath: filepath.Clean(path),
+			UbisoftConnectPath:   filepath.Clean(path),
+			UbisoftConnectUserID: strings.TrimSpace(ubisoftUserIDEntry.Text),
 		}
 		if err := appsettings.Save(toSave); err != nil {
 			dialog.ShowError(err, s.window)
@@ -462,20 +465,26 @@ func (s *uiState) openSettingsDialog() {
 	pathLabel := widget.NewLabel("Ubisoft Connect 설치 경로")
 	pathRow := container.NewBorder(nil, nil, nil, openFolderPicker, ubisoftPathEntry)
 	pathSection := container.NewVBox()
+	userIDLabel := widget.NewLabel("Ubisoft Connect USER ID")
+	userIDRow := container.NewBorder(nil, nil, userIDLabel, nil, ubisoftUserIDEntry)
+	userIDSection := container.NewVBox()
 	updatePathLayout := func(totalWidth float32) {
 		if totalWidth >= 640 {
 			pathSection.Objects = []fyne.CanvasObject{
 				container.NewBorder(nil, nil, pathLabel, nil, pathRow),
 			}
+			userIDSection.Objects = []fyne.CanvasObject{userIDRow}
 		} else {
 			pathSection.Objects = []fyne.CanvasObject{pathLabel, pathRow}
+			userIDSection.Objects = []fyne.CanvasObject{userIDLabel, ubisoftUserIDEntry}
 		}
 		pathSection.Refresh()
+		userIDSection.Refresh()
 	}
 	updatePathLayout(720)
 
 	buttonRow := container.NewGridWithColumns(2, saveButton, cancelButton)
-	contentBody := container.NewVBox(pathSection, widget.NewSeparator(), openManageButton, buttonRow)
+	contentBody := container.NewVBox(pathSection, userIDSection, widget.NewSeparator(), openManageButton, buttonRow)
 	content := container.New(&resizeAwareLayout{
 		onResize: func(size fyne.Size) {
 			updatePathLayout(size.Width)

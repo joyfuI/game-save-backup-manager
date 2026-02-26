@@ -13,10 +13,12 @@ import (
 const (
 	defaultUbisoftConnectPathRaw = `%PROGRAMFILES(X86)%\Ubisoft\Ubisoft Game Launcher`
 	keyUbisoftConnectPath        = "ubisoft_connect_path"
+	keyUbisoftConnectUserID      = "ubisoft_connect_user_id"
 )
 
 type Settings struct {
 	UbisoftConnectPath string
+	UbisoftConnectUserID string
 }
 
 func DefaultUbisoftConnectPath() string {
@@ -59,6 +61,11 @@ func Load() (Settings, error) {
 			if cleaned != "" {
 				settings.UbisoftConnectPath = cleaned
 			}
+			continue
+		}
+
+		if strings.EqualFold(strings.TrimSpace(key), keyUbisoftConnectUserID) {
+			settings.UbisoftConnectUserID = strings.TrimSpace(value)
 		}
 	}
 
@@ -80,7 +87,12 @@ func Save(settings Settings) error {
 		pathValue = DefaultUbisoftConnectPath()
 	}
 
-	content := fmt.Sprintf("[settings]\n%s=%s\n", keyUbisoftConnectPath, pathValue)
+	userIDValue := strings.TrimSpace(settings.UbisoftConnectUserID)
+
+	content := fmt.Sprintf("[settings]\n%s=%s\n%s=%s\n",
+		keyUbisoftConnectPath, pathValue,
+		keyUbisoftConnectUserID, userIDValue,
+	)
 	return os.WriteFile(filePath, []byte(content), 0644)
 }
 

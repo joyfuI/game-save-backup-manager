@@ -17,6 +17,7 @@
 - `설정` 버튼은 별도 창이 아니라 다이얼로그를 연다.
 - 설정 다이얼로그의 현재 구성:
   - `Ubisoft Connect 설치 경로` 입력
+  - `Ubisoft Connect USER ID` 입력 (기본값 빈 문자열)
   - `폴더 선택` 버튼(Fyne 폴더 다이얼로그)
   - `DB 관리` 버튼
   - `DB 관리` 아래 버튼: `저장` / `취소` (가로 1:1 너비)
@@ -43,9 +44,11 @@
 - 파일명: 실행 파일명 기반 (`<exe basename>.ini`)
 - 저장 위치: 실행 파일과 같은 디렉터리
 - 키: `ubisoft_connect_path`
+- 키: `ubisoft_connect_user_id`
 - 기본값(ini 없을 때): `%PROGRAMFILES(X86)%\Ubisoft\Ubisoft Game Launcher`
   - UI 표시 시 환경변수를 실제 경로로 치환한 값 사용
   - 저장 시에도 치환된 실제 경로를 저장
+- `ubisoft_connect_user_id` 기본값: 빈 문자열
 - 프로그램 시작 시 ini가 없으면 기본값으로 자동 생성한다.
 
 ## 빌드/검증 절차
