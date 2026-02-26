@@ -404,8 +404,41 @@ func (s *uiState) openSettingsDialog() {
 	ubisoftPathEntry.SetText(loaded.UbisoftConnectPath)
 	ubisoftUserIDEntry := widget.NewEntry()
 	ubisoftUserIDEntry.SetText(loaded.UbisoftConnectUserID)
+	steamPathEntry := widget.NewEntry()
+	steamPathEntry.SetText(loaded.SteamPath)
+	steamUserIDEntry := widget.NewEntry()
+	steamUserIDEntry.SetText(loaded.SteamUserID)
 
-	openFolderPicker := widget.NewButton("폴더 선택", func() {
+	openSteamFolderPicker := widget.NewButton("폴더 선택", func() {
+		folderDialog := dialog.NewFolderOpen(func(list fyne.ListableURI, err error) {
+			if err != nil {
+				dialog.ShowError(err, s.window)
+				return
+			}
+			if list == nil {
+				return
+			}
+			chosen := normalizeLocalPathFromURI(list.Path())
+			if strings.TrimSpace(chosen) == "" {
+				return
+			}
+			steamPathEntry.SetText(filepath.Clean(chosen))
+		}, s.window)
+
+		currentPath := strings.TrimSpace(pathutil.ExpandPathVariables(steamPathEntry.Text))
+		if currentPath != "" {
+			if info, statErr := os.Stat(currentPath); statErr == nil && info.IsDir() {
+				if uri := fynestorage.NewFileURI(currentPath); uri != nil {
+					if listable, listErr := fynestorage.ListerForURI(uri); listErr == nil {
+						folderDialog.SetLocation(listable)
+					}
+				}
+			}
+		}
+
+		folderDialog.Show()
+	})
+	openUbisoftFolderPicker := widget.NewButton("폴더 선택", func() {
 		folderDialog := dialog.NewFolderOpen(func(list fyne.ListableURI, err error) {
 			if err != nil {
 				dialog.ShowError(err, s.window)
@@ -438,20 +471,29 @@ func (s *uiState) openSettingsDialog() {
 	openManageButton := widget.NewButton("DB 관리", func() {
 		s.openManageWindow()
 	})
-	pathRow := container.NewBorder(nil, nil, nil, openFolderPicker, ubisoftPathEntry)
-	userIDRow := ubisoftUserIDEntry
+	steamPathRow := container.NewBorder(nil, nil, nil, openSteamFolderPicker, steamPathEntry)
+	steamUserIDRow := steamUserIDEntry
+	ubisoftPathRow := container.NewBorder(nil, nil, nil, openUbisoftFolderPicker, ubisoftPathEntry)
+	ubisoftUserIDRow := ubisoftUserIDEntry
 
 	var settingsDialog dialog.Dialog
 
 	saveButton := widget.NewButton("저장", func() {
-		path := strings.TrimSpace(pathutil.ExpandPathVariables(ubisoftPathEntry.Text))
-		if path == "" {
+		steamPath := strings.TrimSpace(pathutil.ExpandPathVariables(steamPathEntry.Text))
+		if steamPath == "" {
+			dialog.ShowError(fmt.Errorf("Steam 설치 경로를 입력해 주세요"), s.window)
+			return
+		}
+		ubisoftPath := strings.TrimSpace(pathutil.ExpandPathVariables(ubisoftPathEntry.Text))
+		if ubisoftPath == "" {
 			dialog.ShowError(fmt.Errorf("Ubisoft Connect 설치 경로를 입력해 주세요"), s.window)
 			return
 		}
 
 		toSave := appsettings.Settings{
-			UbisoftConnectPath:   filepath.Clean(path),
+			SteamPath:            filepath.Clean(steamPath),
+			SteamUserID:          strings.TrimSpace(steamUserIDEntry.Text),
+			UbisoftConnectPath:   filepath.Clean(ubisoftPath),
 			UbisoftConnectUserID: strings.TrimSpace(ubisoftUserIDEntry.Text),
 		}
 		if err := appsettings.Save(toSave); err != nil {
@@ -473,17 +515,21 @@ func (s *uiState) openSettingsDialog() {
 	})
 
 	content := container.NewVBox(
+		widget.NewLabel("Steam 설치 경로"),
+		steamPathRow,
+		widget.NewLabel("Steam USER ID"),
+		steamUserIDRow,
 		widget.NewLabel("Ubisoft Connect 설치 경로"),
-		pathRow,
+		ubisoftPathRow,
 		widget.NewLabel("Ubisoft Connect USER ID"),
-		userIDRow,
+		ubisoftUserIDRow,
 		widget.NewSeparator(),
 		openManageButton,
 		container.NewGridWithColumns(2, cancelButton, saveButton),
 	)
 
 	settingsDialog = dialog.NewCustomWithoutButtons("설정", content, s.window)
-	settingsDialog.Resize(fyne.NewSize(720, 280))
+	settingsDialog.Resize(fyne.NewSize(720, 380))
 	settingsDialog.Show()
 }
 
@@ -619,8 +665,10 @@ func validateSaveLocationInput(loc model.SaveLocation) error {
 }
 
 func substituteKnownSavePathTokensForValidation(path string) string {
-	resolved := replaceTokenInsensitive(path, "{{ubisoftconnect-path}}", `C:\Ubisoft\Ubisoft Game Launcher`)
-	return replaceTokenInsensitive(resolved, "{{ubisoftconnect-userid}}", "user-id")
+	resolved := replaceTokenInsensitive(path, "{{steam-path}}", `C:\Program Files (x86)\Steam`)
+	resolved = replaceTokenInsensitive(resolved, "{{steam-userid}}", "steam-userid")
+	resolved = replaceTokenInsensitive(resolved, "{{ubisoftconnect-path}}", `C:\Ubisoft\Ubisoft Game Launcher`)
+	return replaceTokenInsensitive(resolved, "{{ubisoftconnect-userid}}", "ubisoft-userid")
 }
 
 func replaceTokenInsensitive(input, token, replacement string) string {

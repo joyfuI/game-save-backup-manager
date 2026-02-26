@@ -18,9 +18,11 @@
 - 메인 상단: 왼쪽 `스캔`, 오른쪽 `설정`.
 - `설정` 버튼은 별도 창이 아니라 다이얼로그를 연다.
 - 설정 다이얼로그의 현재 구성:
+  - `Steam 설치 경로`는 라벨 1줄 + 입력행 1줄(고정 2줄)
+  - `Steam USER ID`는 라벨 1줄 + 입력행 1줄(고정 2줄, 기본값 빈 문자열)
   - `Ubisoft Connect 설치 경로`는 라벨 1줄 + 입력행 1줄(고정 2줄)
   - `Ubisoft Connect USER ID`는 라벨 1줄 + 입력행 1줄(고정 2줄, 기본값 빈 문자열)
-  - `폴더 선택` 버튼(Fyne 폴더 다이얼로그)
+  - 경로 입력마다 `폴더 선택` 버튼(Fyne 폴더 다이얼로그)
   - 폼 바깥에 `DB 관리` 버튼
   - 하단 버튼: `취소` / `저장` (가로 1:1 너비, 저장 강조)
 - 주의: Fyne 기본 `dialog.NewForm`만으로는 "라벨+입력 2줄 고정" + "DB 관리 버튼을 폼 바깥 배치"를 동시에 만족하기 어려워 설정 화면은 `NewCustomWithoutButtons`를 사용한다.
@@ -42,6 +44,8 @@
 - `zip` 감지: Glob 매치 수 기준.
 - `reg` 감지: 위 경로 규칙으로 키/값 타깃을 판별한 뒤 존재 여부 확인.
 - 세이브 경로 플레이스홀더 규칙:
+  - `{{steam-path}}` => 설정의 `Steam 설치 경로`
+  - `{{steam-userid}}` => 설정의 `Steam USER ID`
   - `{{ubisoftconnect-path}}` => 설정의 `Ubisoft Connect 설치 경로`
   - `{{ubisoftconnect-userid}}` => 설정의 `Ubisoft Connect USER ID`
   - 스캔/실제 파일 접근 시에는 플레이스홀더를 설정값으로 치환해 사용
@@ -54,6 +58,12 @@
 - 저장 위치: 실행 파일과 같은 디렉터리
 - 키: `ubisoft_connect_path`
 - 키: `ubisoft_connect_userid`
+- 키: `steam_path`
+- 키: `steam_userid`
+- 기본값(ini 없을 때): `%PROGRAMFILES(X86)%\Steam`
+  - UI 표시 시 환경변수를 실제 경로로 치환한 값 사용
+  - 저장 시에도 치환된 실제 경로를 저장
+- `steam_userid` 기본값: 빈 문자열
 - 기본값(ini 없을 때): `%PROGRAMFILES(X86)%\Ubisoft\Ubisoft Game Launcher`
   - UI 표시 시 환경변수를 실제 경로로 치환한 값 사용
   - 저장 시에도 치환된 실제 경로를 저장

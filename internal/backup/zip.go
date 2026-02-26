@@ -182,12 +182,16 @@ func hasGlobWildcards(path string) bool {
 }
 
 func normalizeLogicalPattern(path string) string {
-	replaced := replaceTokenInsensitive(path, "{{ubisoftconnect-path}}", "__UBISOFTCONNECT_PATH__")
+	replaced := replaceTokenInsensitive(path, "{{steam-path}}", "__STEAM_PATH__")
+	replaced = replaceTokenInsensitive(replaced, "{{steam-userid}}", "__STEAM_USERID__")
+	replaced = replaceTokenInsensitive(replaced, "{{ubisoftconnect-path}}", "__UBISOFTCONNECT_PATH__")
 	return replaceTokenInsensitive(replaced, "{{ubisoftconnect-userid}}", "__UBISOFTCONNECT_USERID__")
 }
 
 func restoreLogicalTokens(path string) string {
-	replaced := strings.ReplaceAll(path, "__UBISOFTCONNECT_PATH__", "{{ubisoftconnect-path}}")
+	replaced := strings.ReplaceAll(path, "__STEAM_PATH__", "{{steam-path}}")
+	replaced = strings.ReplaceAll(replaced, "__STEAM_USERID__", "{{steam-userid}}")
+	replaced = strings.ReplaceAll(replaced, "__UBISOFTCONNECT_PATH__", "{{ubisoftconnect-path}}")
 	return strings.ReplaceAll(replaced, "__UBISOFTCONNECT_USERID__", "{{ubisoftconnect-userid}}")
 }
 

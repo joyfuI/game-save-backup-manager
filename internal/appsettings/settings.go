@@ -11,16 +11,29 @@ import (
 )
 
 const (
+	defaultSteamPathRaw          = `%PROGRAMFILES(X86)%\Steam`
 	defaultUbisoftConnectPathRaw = `%PROGRAMFILES(X86)%\Ubisoft\Ubisoft Game Launcher`
-	keyUbisoftConnectPath        = "ubisoft_connect_path"
-	keyUbisoftConnectUserID      = "ubisoft_connect_userid"
-	tokenUbisoftConnectPath      = "{{ubisoftconnect-path}}"
-	tokenUbisoftConnectUserID    = "{{ubisoftconnect-userid}}"
+
+	keySteamPath            = "steam_path"
+	keySteamUserID          = "steam_userid"
+	keyUbisoftConnectPath   = "ubisoft_connect_path"
+	keyUbisoftConnectUserID = "ubisoft_connect_userid"
+
+	tokenSteamPath            = "{{steam-path}}"
+	tokenSteamUserID          = "{{steam-userid}}"
+	tokenUbisoftConnectPath   = "{{ubisoftconnect-path}}"
+	tokenUbisoftConnectUserID = "{{ubisoftconnect-userid}}"
 )
 
 type Settings struct {
+	SteamPath            string
+	SteamUserID          string
 	UbisoftConnectPath   string
 	UbisoftConnectUserID string
+}
+
+func DefaultSteamPath() string {
+	return filepath.Clean(pathutil.ExpandPathVariables(defaultSteamPathRaw))
 }
 
 func DefaultUbisoftConnectPath() string {
@@ -29,6 +42,7 @@ func DefaultUbisoftConnectPath() string {
 
 func Load() (Settings, error) {
 	settings := Settings{
+		SteamPath:          DefaultSteamPath(),
 		UbisoftConnectPath: DefaultUbisoftConnectPath(),
 	}
 
@@ -58,15 +72,20 @@ func Load() (Settings, error) {
 			continue
 		}
 
-		if strings.EqualFold(strings.TrimSpace(key), keyUbisoftConnectPath) {
+		switch strings.ToLower(strings.TrimSpace(key)) {
+		case keySteamPath:
+			cleaned := filepath.Clean(strings.TrimSpace(value))
+			if cleaned != "" {
+				settings.SteamPath = cleaned
+			}
+		case keySteamUserID:
+			settings.SteamUserID = strings.TrimSpace(value)
+		case keyUbisoftConnectPath:
 			cleaned := filepath.Clean(strings.TrimSpace(value))
 			if cleaned != "" {
 				settings.UbisoftConnectPath = cleaned
 			}
-			continue
-		}
-
-		if strings.EqualFold(strings.TrimSpace(key), keyUbisoftConnectUserID) {
+		case keyUbisoftConnectUserID:
 			settings.UbisoftConnectUserID = strings.TrimSpace(value)
 		}
 	}
@@ -84,18 +103,26 @@ func Save(settings Settings) error {
 		return err
 	}
 
-	pathValue := filepath.Clean(strings.TrimSpace(pathutil.ExpandPathVariables(settings.UbisoftConnectPath)))
-	if pathValue == "" {
-		pathValue = DefaultUbisoftConnectPath()
+	steamPathValue := filepath.Clean(strings.TrimSpace(pathutil.ExpandPathVariables(settings.SteamPath)))
+	if steamPathValue == "" {
+		steamPathValue = DefaultSteamPath()
 	}
 
-	userIDValue := strings.TrimSpace(settings.UbisoftConnectUserID)
+	ubisoftPathValue := filepath.Clean(strings.TrimSpace(pathutil.ExpandPathVariables(settings.UbisoftConnectPath)))
+	if ubisoftPathValue == "" {
+		ubisoftPathValue = DefaultUbisoftConnectPath()
+	}
 
-	content := fmt.Sprintf("[settings]\n%s=%s\n%s=%s\n",
-		keyUbisoftConnectPath, pathValue,
-		keyUbisoftConnectUserID, userIDValue,
+	steamUserIDValue := strings.TrimSpace(settings.SteamUserID)
+	ubisoftUserIDValue := strings.TrimSpace(settings.UbisoftConnectUserID)
+
+	content := fmt.Sprintf("[settings]\n%s=%s\n%s=%s\n%s=%s\n%s=%s\n",
+		keySteamPath, steamPathValue,
+		keySteamUserID, steamUserIDValue,
+		keyUbisoftConnectPath, ubisoftPathValue,
+		keyUbisoftConnectUserID, ubisoftUserIDValue,
 	)
-	return os.WriteFile(filePath, []byte(content), 0644)
+	return os.WriteFile(filePath, []byte(content), 0o644)
 }
 
 func EnsureInitialized() error {
@@ -111,6 +138,8 @@ func EnsureInitialized() error {
 	}
 
 	return Save(Settings{
+		SteamPath:            DefaultSteamPath(),
+		SteamUserID:          "",
 		UbisoftConnectPath:   DefaultUbisoftConnectPath(),
 		UbisoftConnectUserID: "",
 	})
@@ -127,10 +156,26 @@ func ResolveSavePath(path string) (string, error) {
 func resolveSavePathWithSettings(path string, settings Settings) (string, error) {
 	resolved := path
 
+	if strings.Contains(strings.ToLower(resolved), tokenSteamPath) {
+		steamPath := strings.TrimSpace(pathutil.ExpandPathVariables(settings.SteamPath))
+		if steamPath == "" {
+			return "", fmt.Errorf("steam path setting is empty")
+		}
+		resolved = replaceTokenInsensitive(resolved, tokenSteamPath, filepath.Clean(steamPath))
+	}
+
+	if strings.Contains(strings.ToLower(resolved), tokenSteamUserID) {
+		steamUserID := strings.TrimSpace(settings.SteamUserID)
+		if steamUserID == "" {
+			return "", fmt.Errorf("steam userid setting is empty")
+		}
+		resolved = replaceTokenInsensitive(resolved, tokenSteamUserID, steamUserID)
+	}
+
 	if strings.Contains(strings.ToLower(resolved), tokenUbisoftConnectPath) {
 		installPath := strings.TrimSpace(pathutil.ExpandPathVariables(settings.UbisoftConnectPath))
 		if installPath == "" {
-			return "", fmt.Errorf("Ubisoft Connect 설치 경로 설정이 비어 있습니다")
+			return "", fmt.Errorf("ubisoft connect path setting is empty")
 		}
 		resolved = replaceTokenInsensitive(resolved, tokenUbisoftConnectPath, filepath.Clean(installPath))
 	}
@@ -138,7 +183,7 @@ func resolveSavePathWithSettings(path string, settings Settings) (string, error)
 	if strings.Contains(strings.ToLower(resolved), tokenUbisoftConnectUserID) {
 		userID := strings.TrimSpace(settings.UbisoftConnectUserID)
 		if userID == "" {
-			return "", fmt.Errorf("Ubisoft Connect USER ID 설정이 비어 있습니다")
+			return "", fmt.Errorf("ubisoft connect userid setting is empty")
 		}
 		resolved = replaceTokenInsensitive(resolved, tokenUbisoftConnectUserID, userID)
 	}
