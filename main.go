@@ -470,8 +470,8 @@ func (s *uiState) openSettingsDialog() {
 	}
 	updatePathLayout(720)
 
-	buttonRow := container.NewHBox(saveButton, layout.NewSpacer(), cancelButton)
-	contentBody := container.NewVBox(pathSection, buttonRow, widget.NewSeparator(), openManageButton)
+	buttonRow := container.NewGridWithColumns(2, saveButton, cancelButton)
+	contentBody := container.NewVBox(pathSection, widget.NewSeparator(), openManageButton, buttonRow)
 	content := container.New(&resizeAwareLayout{
 		onResize: func(size fyne.Size) {
 			updatePathLayout(size.Width)
