@@ -17,6 +17,7 @@ Windows에서 게임 세이브를 `zip` 또는 `reg` 형식으로 백업하는 G
 - `Steam USER ID`
 - `Ubisoft Connect 설치 경로`
 - `Ubisoft Connect USER ID`
+- `Rockstar Games Launcher USER ID`
 - `Microsoft Store USER ID`
 
 설정은 실행 파일과 같은 경로의 ini 파일에 저장됩니다.
@@ -25,6 +26,7 @@ Windows에서 게임 세이브를 `zip` 또는 `reg` 형식으로 백업하는 G
   - `steam_path`
   - `steam_userid`
   - `microsoftstore_userid`
+  - `rockstargameslauncher_userid`
   - `ubisoft_connect_path`
   - `ubisoft_connect_userid`
 
@@ -33,6 +35,7 @@ Windows에서 게임 세이브를 `zip` 또는 `reg` 형식으로 백업하는 G
 - `{{steam-path}}` => 설정의 Steam 설치 경로
 - `{{steam-userid}}` => 설정의 Steam USER ID
 - `{{microsoftstore-userid}}` => 설정의 Microsoft Store USER ID
+- `{{rockstargameslauncher-userid}}` => 설정의 Rockstar Games Launcher USER ID
 - `{{ubisoftconnect-path}}` => 설정의 Ubisoft Connect 설치 경로
 - `{{ubisoftconnect-userid}}` => 설정의 Ubisoft Connect USER ID
 
@@ -63,8 +66,10 @@ go run .
 ## 빌드
 ```powershell
 go build ./...
+# 패키징 검증(디버깅/로컬 확인)
 fyne package -os windows
-# 배포용
+
+# 배포 파일이 필요할 때만
 fyne package -os windows -release
 ```
 

@@ -14,25 +14,28 @@ const (
 	defaultSteamPathRaw          = `%PROGRAMFILES(X86)%\Steam`
 	defaultUbisoftConnectPathRaw = `%PROGRAMFILES(X86)%\Ubisoft\Ubisoft Game Launcher`
 
-	keySteamPath            = "steam_path"
-	keySteamUserID          = "steam_userid"
-	keyMicrosoftStoreUserID = "microsoftstore_userid"
-	keyUbisoftConnectPath   = "ubisoft_connect_path"
-	keyUbisoftConnectUserID = "ubisoft_connect_userid"
+	keySteamPath              = "steam_path"
+	keySteamUserID            = "steam_userid"
+	keyMicrosoftStoreUserID   = "microsoftstore_userid"
+	keyRockstarLauncherUserID = "rockstargameslauncher_userid"
+	keyUbisoftConnectPath     = "ubisoft_connect_path"
+	keyUbisoftConnectUserID   = "ubisoft_connect_userid"
 
-	tokenSteamPath            = "{{steam-path}}"
-	tokenSteamUserID          = "{{steam-userid}}"
-	tokenMicrosoftStoreUserID = "{{microsoftstore-userid}}"
-	tokenUbisoftConnectPath   = "{{ubisoftconnect-path}}"
-	tokenUbisoftConnectUserID = "{{ubisoftconnect-userid}}"
+	tokenSteamPath              = "{{steam-path}}"
+	tokenSteamUserID            = "{{steam-userid}}"
+	tokenMicrosoftStoreUserID   = "{{microsoftstore-userid}}"
+	tokenRockstarLauncherUserID = "{{rockstargameslauncher-userid}}"
+	tokenUbisoftConnectPath     = "{{ubisoftconnect-path}}"
+	tokenUbisoftConnectUserID   = "{{ubisoftconnect-userid}}"
 )
 
 type Settings struct {
-	SteamPath            string
-	SteamUserID          string
-	MicrosoftStoreUserID string
-	UbisoftConnectPath   string
-	UbisoftConnectUserID string
+	SteamPath              string
+	SteamUserID            string
+	MicrosoftStoreUserID   string
+	RockstarLauncherUserID string
+	UbisoftConnectPath     string
+	UbisoftConnectUserID   string
 }
 
 func DefaultSteamPath() string {
@@ -85,6 +88,8 @@ func Load() (Settings, error) {
 			settings.SteamUserID = strings.TrimSpace(value)
 		case keyMicrosoftStoreUserID:
 			settings.MicrosoftStoreUserID = strings.TrimSpace(value)
+		case keyRockstarLauncherUserID:
+			settings.RockstarLauncherUserID = strings.TrimSpace(value)
 		case keyUbisoftConnectPath:
 			cleaned := filepath.Clean(strings.TrimSpace(value))
 			if cleaned != "" {
@@ -120,12 +125,14 @@ func Save(settings Settings) error {
 
 	steamUserIDValue := strings.TrimSpace(settings.SteamUserID)
 	microsoftStoreUserIDValue := strings.TrimSpace(settings.MicrosoftStoreUserID)
+	rockstarLauncherUserIDValue := strings.TrimSpace(settings.RockstarLauncherUserID)
 	ubisoftUserIDValue := strings.TrimSpace(settings.UbisoftConnectUserID)
 
-	content := fmt.Sprintf("[settings]\n%s=%s\n%s=%s\n%s=%s\n%s=%s\n%s=%s\n",
+	content := fmt.Sprintf("[settings]\n%s=%s\n%s=%s\n%s=%s\n%s=%s\n%s=%s\n%s=%s\n",
 		keySteamPath, steamPathValue,
 		keySteamUserID, steamUserIDValue,
 		keyMicrosoftStoreUserID, microsoftStoreUserIDValue,
+		keyRockstarLauncherUserID, rockstarLauncherUserIDValue,
 		keyUbisoftConnectPath, ubisoftPathValue,
 		keyUbisoftConnectUserID, ubisoftUserIDValue,
 	)
@@ -145,11 +152,12 @@ func EnsureInitialized() error {
 	}
 
 	return Save(Settings{
-		SteamPath:            DefaultSteamPath(),
-		SteamUserID:          "",
-		MicrosoftStoreUserID: "",
-		UbisoftConnectPath:   DefaultUbisoftConnectPath(),
-		UbisoftConnectUserID: "",
+		SteamPath:              DefaultSteamPath(),
+		SteamUserID:            "",
+		MicrosoftStoreUserID:   "",
+		RockstarLauncherUserID: "",
+		UbisoftConnectPath:     DefaultUbisoftConnectPath(),
+		UbisoftConnectUserID:   "",
 	})
 }
 
@@ -185,6 +193,13 @@ func resolveSavePathWithSettings(path string, settings Settings) (string, error)
 			return "", fmt.Errorf("microsoft store userid setting is empty")
 		}
 		resolved = replaceTokenInsensitive(resolved, tokenMicrosoftStoreUserID, microsoftStoreUserID)
+	}
+	if strings.Contains(strings.ToLower(resolved), tokenRockstarLauncherUserID) {
+		rockstarLauncherUserID := strings.TrimSpace(settings.RockstarLauncherUserID)
+		if rockstarLauncherUserID == "" {
+			return "", fmt.Errorf("rockstar games launcher userid setting is empty")
+		}
+		resolved = replaceTokenInsensitive(resolved, tokenRockstarLauncherUserID, rockstarLauncherUserID)
 	}
 
 	if strings.Contains(strings.ToLower(resolved), tokenUbisoftConnectPath) {

@@ -410,6 +410,8 @@ func (s *uiState) openSettingsDialog() {
 	steamUserIDEntry.SetText(loaded.SteamUserID)
 	microsoftStoreUserIDEntry := widget.NewEntry()
 	microsoftStoreUserIDEntry.SetText(loaded.MicrosoftStoreUserID)
+	rockstarLauncherUserIDEntry := widget.NewEntry()
+	rockstarLauncherUserIDEntry.SetText(loaded.RockstarLauncherUserID)
 
 	openSteamFolderPicker := widget.NewButton("폴더 선택", func() {
 		folderDialog := dialog.NewFolderOpen(func(list fyne.ListableURI, err error) {
@@ -493,10 +495,15 @@ func (s *uiState) openSettingsDialog() {
 		widget.NewLabel("Microsoft Store USER ID"),
 		microsoftStoreUserIDEntry,
 	)
+	rockstarLauncherTab := container.NewVBox(
+		widget.NewLabel("Rockstar Games Launcher USER ID"),
+		rockstarLauncherUserIDEntry,
+	)
 	tabs := container.NewAppTabs(
 		container.NewTabItem("Steam", steamTab),
-		container.NewTabItem("Ubisoft Connect", ubisoftTab),
-		container.NewTabItem("Microsoft Store", microsoftStoreTab),
+		container.NewTabItem("Ubisoft", ubisoftTab),
+		container.NewTabItem("Rockstar Games", rockstarLauncherTab),
+		container.NewTabItem("Microsoft", microsoftStoreTab),
 	)
 
 	var settingsDialog dialog.Dialog
@@ -514,11 +521,12 @@ func (s *uiState) openSettingsDialog() {
 		}
 
 		toSave := appsettings.Settings{
-			SteamPath:            filepath.Clean(steamPath),
-			SteamUserID:          strings.TrimSpace(steamUserIDEntry.Text),
-			MicrosoftStoreUserID: strings.TrimSpace(microsoftStoreUserIDEntry.Text),
-			UbisoftConnectPath:   filepath.Clean(ubisoftPath),
-			UbisoftConnectUserID: strings.TrimSpace(ubisoftUserIDEntry.Text),
+			SteamPath:              filepath.Clean(steamPath),
+			SteamUserID:            strings.TrimSpace(steamUserIDEntry.Text),
+			MicrosoftStoreUserID:   strings.TrimSpace(microsoftStoreUserIDEntry.Text),
+			RockstarLauncherUserID: strings.TrimSpace(rockstarLauncherUserIDEntry.Text),
+			UbisoftConnectPath:     filepath.Clean(ubisoftPath),
+			UbisoftConnectUserID:   strings.TrimSpace(ubisoftUserIDEntry.Text),
 		}
 		if err := appsettings.Save(toSave); err != nil {
 			dialog.ShowError(err, s.window)
@@ -685,6 +693,7 @@ func substituteKnownSavePathTokensForValidation(path string) string {
 	resolved := replaceTokenInsensitive(path, "{{steam-path}}", `C:\Program Files (x86)\Steam`)
 	resolved = replaceTokenInsensitive(resolved, "{{steam-userid}}", "steam-userid")
 	resolved = replaceTokenInsensitive(resolved, "{{microsoftstore-userid}}", "microsoftstore-userid")
+	resolved = replaceTokenInsensitive(resolved, "{{rockstargameslauncher-userid}}", "rockstar-launcher-userid")
 	resolved = replaceTokenInsensitive(resolved, "{{ubisoftconnect-path}}", `C:\Ubisoft\Ubisoft Game Launcher`)
 	return replaceTokenInsensitive(resolved, "{{ubisoftconnect-userid}}", "ubisoft-userid")
 }
