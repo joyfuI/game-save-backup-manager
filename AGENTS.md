@@ -6,9 +6,11 @@
 ## 하드 규칙 (중요)
 - exe 산출물은 프로젝트 루트의 `game-save-backup-manager.exe`.
 - Windows 패키징은 `FyneApp.toml` 메타데이터 기반 `fyne package -os windows`를 사용.
-- 배포 패키징은 `fyne package -os windows -release`를 기본으로 사용.
+- `fyne package -os windows -release`는 배포 산출물이 필요할 때만 사용한다.
 - `fyne package` 실행 후에는 항상 `git restore -- FyneApp.toml`로 `Build` 자동 증가를 원복한다.
 - `FyneApp.toml`의 `Build` 값 기준은 `1`로 유지한다.
+- 기능/설정/계약 변경 시 `README.md`와 `AGENTS.md`를 함께 업데이트하고, `AGENTS.md`에는 코드만으로 파악 어려운 맥락/합의/운영 규칙 중심으로 기록한다.
+- Git 커밋은 에이전트가 작업 완료 후 자율적으로 수행하되, 의미 있는 기능/수정 단위로 나눈다(너무 작은 변경은 묶고, 큰 변경은 기능별로 분리).
 - `reg` 경로 해석 규칙은 고정:
   - 경로가 `\\`로 끝나면 키 전체 백업/검증 대상.
   - 경로가 `\\`로 끝나지 않으면 마지막 세그먼트를 값 이름으로 간주해 값 단일 백업/검증 대상.
@@ -18,9 +20,9 @@
 - 메인 상단: 왼쪽 `스캔`, 오른쪽 `설정`.
 - `설정` 버튼은 별도 창이 아니라 다이얼로그를 연다.
 - 설정 다이얼로그의 현재 구성:
-  - 탭 구성: `Steam`, `Ubisoft Connect`, `Microsoft Store`
+  - 탭 구성: `Steam`, `Ubisoft`, `Rockstar Games`, `Microsoft`
   - 각 탭: `설치 경로` + `USER ID` (각각 라벨 1줄 + 입력행 1줄)
-  - 예외: `Microsoft Store` 탭은 `USER ID`만 있고 설치 경로 항목은 없음
+  - 예외: `Rockstar Games`, `Microsoft` 탭은 `USER ID`만 있고 설치 경로 항목은 없음
   - 각 경로 입력행 우측에 `폴더 선택` 버튼(Fyne 폴더 다이얼로그)
   - 폼 바깥에 `DB 관리` 버튼
   - 하단 버튼: `취소` / `저장` (가로 1:1 너비, 저장 강조)
@@ -46,6 +48,7 @@
   - `{{steam-path}}` => 설정의 `Steam 설치 경로`
   - `{{steam-userid}}` => 설정의 `Steam USER ID`
   - `{{microsoftstore-userid}}` => 설정의 `Microsoft Store USER ID`
+  - `{{rockstargameslauncher-userid}}` => 설정의 `Rockstar Games Launcher USER ID`
   - `{{ubisoftconnect-path}}` => 설정의 `Ubisoft Connect 설치 경로`
   - `{{ubisoftconnect-userid}}` => 설정의 `Ubisoft Connect USER ID`
   - 스캔/실제 파일 접근 시에는 플레이스홀더를 설정값으로 치환해 사용
@@ -61,11 +64,13 @@
 - 키: `steam_path`
 - 키: `steam_userid`
 - 키: `microsoftstore_userid`
+- 키: `rockstargameslauncher_userid`
 - 기본값(ini 없을 때): `%PROGRAMFILES(X86)%\Steam`
   - UI 표시 시 환경변수를 실제 경로로 치환한 값 사용
   - 저장 시에도 치환된 실제 경로를 저장
 - `steam_userid` 기본값: 빈 문자열
 - `microsoftstore_userid` 기본값: 빈 문자열
+- `rockstargameslauncher_userid` 기본값: 빈 문자열
 - 기본값(ini 없을 때): `%PROGRAMFILES(X86)%\Ubisoft\Ubisoft Game Launcher`
   - UI 표시 시 환경변수를 실제 경로로 치환한 값 사용
   - 저장 시에도 치환된 실제 경로를 저장
@@ -74,9 +79,9 @@
 
 ## 빌드/검증 절차
 1. `go build ./...`
-2. `fyne package -os windows`
+2. 패키징 검증(디버깅/로컬 확인): `fyne package -os windows`
    - 직후 `git restore -- FyneApp.toml`
-3. 배포 빌드 시 `fyne package -os windows -release`
+3. 배포 빌드(배포 파일 생성이 필요할 때만): `fyne package -os windows -release`
    - 직후 `git restore -- FyneApp.toml`
 
 ## 환경 특이사항
