@@ -8,7 +8,6 @@
 bin/
 
 # App runtime artifacts
-savelocation.db
 *.ini
 backups/
 
