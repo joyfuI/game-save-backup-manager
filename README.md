@@ -15,30 +15,30 @@ Windows에서 게임 세이브를 `zip` 또는 `reg` 형식으로 백업하는 G
 설정 다이얼로그에서 아래 항목을 관리합니다.
 - `Steam 설치 경로`
 - `Steam USER ID`
+- `Steam ACCOUNT ID`
 - `Ubisoft Connect 설치 경로`
 - `Ubisoft Connect USER ID`
 - `Rockstar Games Launcher USER ID`
 - `Microsoft Store USER ID`
-- `Square Enix USER ID`
 
 설정은 실행 파일과 같은 경로의 ini 파일에 저장됩니다.
 - 파일명: `<exe basename>.ini` (예: `game-save-backup-manager.ini`)
 - 키:
   - `steam_path`
   - `steam_userid`
+  - `steam_accountid`
   - `ubisoft_connect_path`
   - `ubisoft_connect_userid`
   - `rockstargameslauncher_userid`
   - `microsoftstore_userid`
-  - `squareenix_userid`
 
 ## 세이브 경로 플레이스홀더
 `zip` 타입 path에서 아래 플레이스홀더를 사용할 수 있습니다.
 - `{{steam-path}}` => 설정의 Steam 설치 경로
 - `{{steam-userid}}` => 설정의 Steam USER ID
+- `{{steam-accountid}}` => 설정의 Steam ACCOUNT ID
 - `{{microsoftstore-userid}}` => 설정의 Microsoft Store USER ID
 - `{{rockstargameslauncher-userid}}` => 설정의 Rockstar Games Launcher USER ID
-- `{{squareenix-userid}}` => 설정의 Square Enix USER ID
 - `{{ubisoftconnect-path}}` => 설정의 Ubisoft Connect 설치 경로
 - `{{ubisoftconnect-userid}}` => 설정의 Ubisoft Connect USER ID
 

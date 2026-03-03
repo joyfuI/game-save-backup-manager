@@ -16,17 +16,17 @@ const (
 
 	keySteamPath              = "steam_path"
 	keySteamUserID            = "steam_userid"
+	keySteamAccountID         = "steam_accountid"
 	keyMicrosoftStoreUserID   = "microsoftstore_userid"
 	keyRockstarLauncherUserID = "rockstargameslauncher_userid"
-	keySquareEnixUserID       = "squareenix_userid"
 	keyUbisoftConnectPath     = "ubisoft_connect_path"
 	keyUbisoftConnectUserID   = "ubisoft_connect_userid"
 
 	tokenSteamPath              = "{{steam-path}}"
 	tokenSteamUserID            = "{{steam-userid}}"
+	tokenSteamAccountID         = "{{steam-accountid}}"
 	tokenMicrosoftStoreUserID   = "{{microsoftstore-userid}}"
 	tokenRockstarLauncherUserID = "{{rockstargameslauncher-userid}}"
-	tokenSquareEnixUserID       = "{{squareenix-userid}}"
 	tokenUbisoftConnectPath     = "{{ubisoftconnect-path}}"
 	tokenUbisoftConnectUserID   = "{{ubisoftconnect-userid}}"
 )
@@ -34,9 +34,9 @@ const (
 type Settings struct {
 	SteamPath              string
 	SteamUserID            string
+	SteamAccountID         string
 	MicrosoftStoreUserID   string
 	RockstarLauncherUserID string
-	SquareEnixUserID       string
 	UbisoftConnectPath     string
 	UbisoftConnectUserID   string
 }
@@ -89,12 +89,12 @@ func Load() (Settings, error) {
 			}
 		case keySteamUserID:
 			settings.SteamUserID = strings.TrimSpace(value)
+		case keySteamAccountID:
+			settings.SteamAccountID = strings.TrimSpace(value)
 		case keyMicrosoftStoreUserID:
 			settings.MicrosoftStoreUserID = strings.TrimSpace(value)
 		case keyRockstarLauncherUserID:
 			settings.RockstarLauncherUserID = strings.TrimSpace(value)
-		case keySquareEnixUserID:
-			settings.SquareEnixUserID = strings.TrimSpace(value)
 		case keyUbisoftConnectPath:
 			cleaned := filepath.Clean(strings.TrimSpace(value))
 			if cleaned != "" {
@@ -129,19 +129,19 @@ func Save(settings Settings) error {
 	}
 
 	steamUserIDValue := strings.TrimSpace(settings.SteamUserID)
+	steamAccountIDValue := strings.TrimSpace(settings.SteamAccountID)
 	microsoftStoreUserIDValue := strings.TrimSpace(settings.MicrosoftStoreUserID)
 	rockstarLauncherUserIDValue := strings.TrimSpace(settings.RockstarLauncherUserID)
-	squareEnixUserIDValue := strings.TrimSpace(settings.SquareEnixUserID)
 	ubisoftUserIDValue := strings.TrimSpace(settings.UbisoftConnectUserID)
 
 	content := fmt.Sprintf("[settings]\n%s=%s\n%s=%s\n%s=%s\n%s=%s\n%s=%s\n%s=%s\n%s=%s\n",
 		keySteamPath, steamPathValue,
 		keySteamUserID, steamUserIDValue,
+		keySteamAccountID, steamAccountIDValue,
 		keyUbisoftConnectPath, ubisoftPathValue,
 		keyUbisoftConnectUserID, ubisoftUserIDValue,
 		keyRockstarLauncherUserID, rockstarLauncherUserIDValue,
 		keyMicrosoftStoreUserID, microsoftStoreUserIDValue,
-		keySquareEnixUserID, squareEnixUserIDValue,
 	)
 	return os.WriteFile(filePath, []byte(content), 0o644)
 }
@@ -161,9 +161,9 @@ func EnsureInitialized() error {
 	return Save(Settings{
 		SteamPath:              DefaultSteamPath(),
 		SteamUserID:            "",
+		SteamAccountID:         "",
 		MicrosoftStoreUserID:   "",
 		RockstarLauncherUserID: "",
-		SquareEnixUserID:       "",
 		UbisoftConnectPath:     DefaultUbisoftConnectPath(),
 		UbisoftConnectUserID:   "",
 	})
@@ -195,6 +195,13 @@ func resolveSavePathWithSettings(path string, settings Settings) (string, error)
 		}
 		resolved = replaceTokenInsensitive(resolved, tokenSteamUserID, steamUserID)
 	}
+	if strings.Contains(strings.ToLower(resolved), tokenSteamAccountID) {
+		steamAccountID := strings.TrimSpace(settings.SteamAccountID)
+		if steamAccountID == "" {
+			return "", fmt.Errorf("steam accountid setting is empty")
+		}
+		resolved = replaceTokenInsensitive(resolved, tokenSteamAccountID, steamAccountID)
+	}
 	if strings.Contains(strings.ToLower(resolved), tokenMicrosoftStoreUserID) {
 		microsoftStoreUserID := strings.TrimSpace(settings.MicrosoftStoreUserID)
 		if microsoftStoreUserID == "" {
@@ -208,13 +215,6 @@ func resolveSavePathWithSettings(path string, settings Settings) (string, error)
 			return "", fmt.Errorf("rockstar games launcher userid setting is empty")
 		}
 		resolved = replaceTokenInsensitive(resolved, tokenRockstarLauncherUserID, rockstarLauncherUserID)
-	}
-	if strings.Contains(strings.ToLower(resolved), tokenSquareEnixUserID) {
-		squareEnixUserID := strings.TrimSpace(settings.SquareEnixUserID)
-		if squareEnixUserID == "" {
-			return "", fmt.Errorf("square enix userid setting is empty")
-		}
-		resolved = replaceTokenInsensitive(resolved, tokenSquareEnixUserID, squareEnixUserID)
 	}
 
 	if strings.Contains(strings.ToLower(resolved), tokenUbisoftConnectPath) {

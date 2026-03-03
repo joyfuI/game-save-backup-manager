@@ -408,12 +408,12 @@ func (s *uiState) openSettingsDialog() {
 	steamPathEntry.SetText(loaded.SteamPath)
 	steamUserIDEntry := widget.NewEntry()
 	steamUserIDEntry.SetText(loaded.SteamUserID)
+	steamAccountIDEntry := widget.NewEntry()
+	steamAccountIDEntry.SetText(loaded.SteamAccountID)
 	microsoftStoreUserIDEntry := widget.NewEntry()
 	microsoftStoreUserIDEntry.SetText(loaded.MicrosoftStoreUserID)
 	rockstarLauncherUserIDEntry := widget.NewEntry()
 	rockstarLauncherUserIDEntry.SetText(loaded.RockstarLauncherUserID)
-	squareEnixUserIDEntry := widget.NewEntry()
-	squareEnixUserIDEntry.SetText(loaded.SquareEnixUserID)
 
 	openSteamFolderPicker := widget.NewButton("폴더 선택", func() {
 		folderDialog := dialog.NewFolderOpen(func(list fyne.ListableURI, err error) {
@@ -486,6 +486,8 @@ func (s *uiState) openSettingsDialog() {
 		steamPathRow,
 		widget.NewLabel("Steam USER ID"),
 		steamUserIDRow,
+		widget.NewLabel("Steam ACCOUNT ID"),
+		steamAccountIDEntry,
 	)
 	ubisoftTab := container.NewVBox(
 		widget.NewLabel("Ubisoft Connect 설치 경로"),
@@ -501,16 +503,11 @@ func (s *uiState) openSettingsDialog() {
 		widget.NewLabel("Rockstar Games Launcher USER ID"),
 		rockstarLauncherUserIDEntry,
 	)
-	etcTab := container.NewVBox(
-		widget.NewLabel("Square Enix USER ID"),
-		squareEnixUserIDEntry,
-	)
 	tabs := container.NewAppTabs(
 		container.NewTabItem("Steam", steamTab),
 		container.NewTabItem("Ubisoft", ubisoftTab),
 		container.NewTabItem("Rockstar Games", rockstarLauncherTab),
 		container.NewTabItem("Microsoft", microsoftStoreTab),
-		container.NewTabItem("etc.", etcTab),
 	)
 
 	var settingsDialog dialog.Dialog
@@ -530,9 +527,9 @@ func (s *uiState) openSettingsDialog() {
 		toSave := appsettings.Settings{
 			SteamPath:              filepath.Clean(steamPath),
 			SteamUserID:            strings.TrimSpace(steamUserIDEntry.Text),
+			SteamAccountID:         strings.TrimSpace(steamAccountIDEntry.Text),
 			MicrosoftStoreUserID:   strings.TrimSpace(microsoftStoreUserIDEntry.Text),
 			RockstarLauncherUserID: strings.TrimSpace(rockstarLauncherUserIDEntry.Text),
-			SquareEnixUserID:       strings.TrimSpace(squareEnixUserIDEntry.Text),
 			UbisoftConnectPath:     filepath.Clean(ubisoftPath),
 			UbisoftConnectUserID:   strings.TrimSpace(ubisoftUserIDEntry.Text),
 		}
@@ -700,9 +697,9 @@ func validateSaveLocationInput(loc model.SaveLocation) error {
 func substituteKnownSavePathTokensForValidation(path string) string {
 	resolved := replaceTokenInsensitive(path, "{{steam-path}}", `C:\Program Files (x86)\Steam`)
 	resolved = replaceTokenInsensitive(resolved, "{{steam-userid}}", "steam-userid")
+	resolved = replaceTokenInsensitive(resolved, "{{steam-accountid}}", "steam-accountid")
 	resolved = replaceTokenInsensitive(resolved, "{{microsoftstore-userid}}", "microsoftstore-userid")
 	resolved = replaceTokenInsensitive(resolved, "{{rockstargameslauncher-userid}}", "rockstar-launcher-userid")
-	resolved = replaceTokenInsensitive(resolved, "{{squareenix-userid}}", "squareenix-userid")
 	resolved = replaceTokenInsensitive(resolved, "{{ubisoftconnect-path}}", `C:\Ubisoft\Ubisoft Game Launcher`)
 	return replaceTokenInsensitive(resolved, "{{ubisoftconnect-userid}}", "ubisoft-userid")
 }
