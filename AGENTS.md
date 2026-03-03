@@ -60,12 +60,12 @@
 - 파일 형식: INI
 - 파일명: 실행 파일명 기반 (`<exe basename>.ini`)
 - 저장 위치: 실행 파일과 같은 디렉터리
-- 키: `ubisoft_connect_path`
-- 키: `ubisoft_connect_userid`
 - 키: `steam_path`
 - 키: `steam_userid`
-- 키: `microsoftstore_userid`
+- 키: `ubisoft_connect_path`
+- 키: `ubisoft_connect_userid`
 - 키: `rockstargameslauncher_userid`
+- 키: `microsoftstore_userid`
 - 키: `squareenix_userid`
 - 기본값(ini 없을 때): `%PROGRAMFILES(X86)%\Steam`
   - UI 표시 시 환경변수를 실제 경로로 치환한 값 사용

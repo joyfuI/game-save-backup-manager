@@ -137,11 +137,11 @@ func Save(settings Settings) error {
 	content := fmt.Sprintf("[settings]\n%s=%s\n%s=%s\n%s=%s\n%s=%s\n%s=%s\n%s=%s\n%s=%s\n",
 		keySteamPath, steamPathValue,
 		keySteamUserID, steamUserIDValue,
-		keyMicrosoftStoreUserID, microsoftStoreUserIDValue,
-		keyRockstarLauncherUserID, rockstarLauncherUserIDValue,
-		keySquareEnixUserID, squareEnixUserIDValue,
 		keyUbisoftConnectPath, ubisoftPathValue,
 		keyUbisoftConnectUserID, ubisoftUserIDValue,
+		keyRockstarLauncherUserID, rockstarLauncherUserIDValue,
+		keyMicrosoftStoreUserID, microsoftStoreUserIDValue,
+		keySquareEnixUserID, squareEnixUserIDValue,
 	)
 	return os.WriteFile(filePath, []byte(content), 0o644)
 }

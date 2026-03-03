@@ -26,11 +26,11 @@ Windows에서 게임 세이브를 `zip` 또는 `reg` 형식으로 백업하는 G
 - 키:
   - `steam_path`
   - `steam_userid`
-  - `microsoftstore_userid`
-  - `rockstargameslauncher_userid`
-  - `squareenix_userid`
   - `ubisoft_connect_path`
   - `ubisoft_connect_userid`
+  - `rockstargameslauncher_userid`
+  - `microsoftstore_userid`
+  - `squareenix_userid`
 
 ## 세이브 경로 플레이스홀더
 `zip` 타입 path에서 아래 플레이스홀더를 사용할 수 있습니다.
