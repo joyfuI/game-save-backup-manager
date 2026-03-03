@@ -412,6 +412,8 @@ func (s *uiState) openSettingsDialog() {
 	microsoftStoreUserIDEntry.SetText(loaded.MicrosoftStoreUserID)
 	rockstarLauncherUserIDEntry := widget.NewEntry()
 	rockstarLauncherUserIDEntry.SetText(loaded.RockstarLauncherUserID)
+	squareEnixUserIDEntry := widget.NewEntry()
+	squareEnixUserIDEntry.SetText(loaded.SquareEnixUserID)
 
 	openSteamFolderPicker := widget.NewButton("폴더 선택", func() {
 		folderDialog := dialog.NewFolderOpen(func(list fyne.ListableURI, err error) {
@@ -499,11 +501,16 @@ func (s *uiState) openSettingsDialog() {
 		widget.NewLabel("Rockstar Games Launcher USER ID"),
 		rockstarLauncherUserIDEntry,
 	)
+	etcTab := container.NewVBox(
+		widget.NewLabel("Square Enix USER ID"),
+		squareEnixUserIDEntry,
+	)
 	tabs := container.NewAppTabs(
 		container.NewTabItem("Steam", steamTab),
 		container.NewTabItem("Ubisoft", ubisoftTab),
 		container.NewTabItem("Rockstar Games", rockstarLauncherTab),
 		container.NewTabItem("Microsoft", microsoftStoreTab),
+		container.NewTabItem("etc.", etcTab),
 	)
 
 	var settingsDialog dialog.Dialog
@@ -525,6 +532,7 @@ func (s *uiState) openSettingsDialog() {
 			SteamUserID:            strings.TrimSpace(steamUserIDEntry.Text),
 			MicrosoftStoreUserID:   strings.TrimSpace(microsoftStoreUserIDEntry.Text),
 			RockstarLauncherUserID: strings.TrimSpace(rockstarLauncherUserIDEntry.Text),
+			SquareEnixUserID:       strings.TrimSpace(squareEnixUserIDEntry.Text),
 			UbisoftConnectPath:     filepath.Clean(ubisoftPath),
 			UbisoftConnectUserID:   strings.TrimSpace(ubisoftUserIDEntry.Text),
 		}
@@ -694,6 +702,7 @@ func substituteKnownSavePathTokensForValidation(path string) string {
 	resolved = replaceTokenInsensitive(resolved, "{{steam-userid}}", "steam-userid")
 	resolved = replaceTokenInsensitive(resolved, "{{microsoftstore-userid}}", "microsoftstore-userid")
 	resolved = replaceTokenInsensitive(resolved, "{{rockstargameslauncher-userid}}", "rockstar-launcher-userid")
+	resolved = replaceTokenInsensitive(resolved, "{{squareenix-userid}}", "squareenix-userid")
 	resolved = replaceTokenInsensitive(resolved, "{{ubisoftconnect-path}}", `C:\Ubisoft\Ubisoft Game Launcher`)
 	return replaceTokenInsensitive(resolved, "{{ubisoftconnect-userid}}", "ubisoft-userid")
 }

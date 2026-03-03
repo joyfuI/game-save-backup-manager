@@ -19,6 +19,7 @@ Windows에서 게임 세이브를 `zip` 또는 `reg` 형식으로 백업하는 G
 - `Ubisoft Connect USER ID`
 - `Rockstar Games Launcher USER ID`
 - `Microsoft Store USER ID`
+- `Square Enix USER ID`
 
 설정은 실행 파일과 같은 경로의 ini 파일에 저장됩니다.
 - 파일명: `<exe basename>.ini` (예: `game-save-backup-manager.ini`)
@@ -27,6 +28,7 @@ Windows에서 게임 세이브를 `zip` 또는 `reg` 형식으로 백업하는 G
   - `steam_userid`
   - `microsoftstore_userid`
   - `rockstargameslauncher_userid`
+  - `squareenix_userid`
   - `ubisoft_connect_path`
   - `ubisoft_connect_userid`
 
@@ -36,6 +38,7 @@ Windows에서 게임 세이브를 `zip` 또는 `reg` 형식으로 백업하는 G
 - `{{steam-userid}}` => 설정의 Steam USER ID
 - `{{microsoftstore-userid}}` => 설정의 Microsoft Store USER ID
 - `{{rockstargameslauncher-userid}}` => 설정의 Rockstar Games Launcher USER ID
+- `{{squareenix-userid}}` => 설정의 Square Enix USER ID
 - `{{ubisoftconnect-path}}` => 설정의 Ubisoft Connect 설치 경로
 - `{{ubisoftconnect-userid}}` => 설정의 Ubisoft Connect USER ID
 

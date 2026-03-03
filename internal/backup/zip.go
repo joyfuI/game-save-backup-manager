@@ -186,6 +186,7 @@ func normalizeLogicalPattern(path string) string {
 	replaced = replaceTokenInsensitive(replaced, "{{steam-userid}}", "__STEAM_USERID__")
 	replaced = replaceTokenInsensitive(replaced, "{{microsoftstore-userid}}", "__MICROSOFTSTORE_USERID__")
 	replaced = replaceTokenInsensitive(replaced, "{{rockstargameslauncher-userid}}", "__ROCKSTARGAMESLAUNCHER_USERID__")
+	replaced = replaceTokenInsensitive(replaced, "{{squareenix-userid}}", "__SQUAREENIX_USERID__")
 	replaced = replaceTokenInsensitive(replaced, "{{ubisoftconnect-path}}", "__UBISOFTCONNECT_PATH__")
 	return replaceTokenInsensitive(replaced, "{{ubisoftconnect-userid}}", "__UBISOFTCONNECT_USERID__")
 }
@@ -195,6 +196,7 @@ func restoreLogicalTokens(path string) string {
 	replaced = strings.ReplaceAll(replaced, "__STEAM_USERID__", "{{steam-userid}}")
 	replaced = strings.ReplaceAll(replaced, "__MICROSOFTSTORE_USERID__", "{{microsoftstore-userid}}")
 	replaced = strings.ReplaceAll(replaced, "__ROCKSTARGAMESLAUNCHER_USERID__", "{{rockstargameslauncher-userid}}")
+	replaced = strings.ReplaceAll(replaced, "__SQUAREENIX_USERID__", "{{squareenix-userid}}")
 	replaced = strings.ReplaceAll(replaced, "__UBISOFTCONNECT_PATH__", "{{ubisoftconnect-path}}")
 	return strings.ReplaceAll(replaced, "__UBISOFTCONNECT_USERID__", "{{ubisoftconnect-userid}}")
 }
