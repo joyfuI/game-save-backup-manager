@@ -7,8 +7,7 @@ import "fmt"
 type TargetKind int
 
 const (
-	TargetUnknown TargetKind = iota
-	TargetKey
+	TargetKey TargetKind = iota + 1
 	TargetValue
 )
 
@@ -28,10 +27,6 @@ type ValueData struct {
 }
 
 func PathExists(path string) (bool, error) {
-	return false, fmt.Errorf("registry checks are only supported on windows")
-}
-
-func KeyExists(path string) (bool, error) {
 	return false, fmt.Errorf("registry checks are only supported on windows")
 }
 

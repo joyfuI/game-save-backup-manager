@@ -185,7 +185,7 @@ func resolveSavePathWithSettings(path string, settings Settings) (string, error)
 		if steamPath == "" {
 			return "", fmt.Errorf("steam path setting is empty")
 		}
-		resolved = replaceTokenInsensitive(resolved, tokenSteamPath, filepath.Clean(steamPath))
+		resolved = pathutil.ReplaceTokenInsensitive(resolved, tokenSteamPath, filepath.Clean(steamPath))
 	}
 
 	if strings.Contains(strings.ToLower(resolved), tokenSteamUserID) {
@@ -193,28 +193,28 @@ func resolveSavePathWithSettings(path string, settings Settings) (string, error)
 		if steamUserID == "" {
 			return "", fmt.Errorf("steam userid setting is empty")
 		}
-		resolved = replaceTokenInsensitive(resolved, tokenSteamUserID, steamUserID)
+		resolved = pathutil.ReplaceTokenInsensitive(resolved, tokenSteamUserID, steamUserID)
 	}
 	if strings.Contains(strings.ToLower(resolved), tokenSteamAccountID) {
 		steamAccountID := strings.TrimSpace(settings.SteamAccountID)
 		if steamAccountID == "" {
 			return "", fmt.Errorf("steam accountid setting is empty")
 		}
-		resolved = replaceTokenInsensitive(resolved, tokenSteamAccountID, steamAccountID)
+		resolved = pathutil.ReplaceTokenInsensitive(resolved, tokenSteamAccountID, steamAccountID)
 	}
 	if strings.Contains(strings.ToLower(resolved), tokenMicrosoftStoreUserID) {
 		microsoftStoreUserID := strings.TrimSpace(settings.MicrosoftStoreUserID)
 		if microsoftStoreUserID == "" {
 			return "", fmt.Errorf("microsoft store userid setting is empty")
 		}
-		resolved = replaceTokenInsensitive(resolved, tokenMicrosoftStoreUserID, microsoftStoreUserID)
+		resolved = pathutil.ReplaceTokenInsensitive(resolved, tokenMicrosoftStoreUserID, microsoftStoreUserID)
 	}
 	if strings.Contains(strings.ToLower(resolved), tokenRockstarLauncherUserID) {
 		rockstarLauncherUserID := strings.TrimSpace(settings.RockstarLauncherUserID)
 		if rockstarLauncherUserID == "" {
 			return "", fmt.Errorf("rockstar games launcher userid setting is empty")
 		}
-		resolved = replaceTokenInsensitive(resolved, tokenRockstarLauncherUserID, rockstarLauncherUserID)
+		resolved = pathutil.ReplaceTokenInsensitive(resolved, tokenRockstarLauncherUserID, rockstarLauncherUserID)
 	}
 
 	if strings.Contains(strings.ToLower(resolved), tokenUbisoftConnectPath) {
@@ -222,7 +222,7 @@ func resolveSavePathWithSettings(path string, settings Settings) (string, error)
 		if installPath == "" {
 			return "", fmt.Errorf("ubisoft connect path setting is empty")
 		}
-		resolved = replaceTokenInsensitive(resolved, tokenUbisoftConnectPath, filepath.Clean(installPath))
+		resolved = pathutil.ReplaceTokenInsensitive(resolved, tokenUbisoftConnectPath, filepath.Clean(installPath))
 	}
 
 	if strings.Contains(strings.ToLower(resolved), tokenUbisoftConnectUserID) {
@@ -230,35 +230,10 @@ func resolveSavePathWithSettings(path string, settings Settings) (string, error)
 		if userID == "" {
 			return "", fmt.Errorf("ubisoft connect userid setting is empty")
 		}
-		resolved = replaceTokenInsensitive(resolved, tokenUbisoftConnectUserID, userID)
+		resolved = pathutil.ReplaceTokenInsensitive(resolved, tokenUbisoftConnectUserID, userID)
 	}
 
 	return pathutil.ExpandPathVariables(resolved), nil
-}
-
-func replaceTokenInsensitive(input, token, replacement string) string {
-	lowerInput := strings.ToLower(input)
-	lowerToken := strings.ToLower(token)
-
-	if !strings.Contains(lowerInput, lowerToken) {
-		return input
-	}
-
-	var builder strings.Builder
-	for {
-		idx := strings.Index(lowerInput, lowerToken)
-		if idx < 0 {
-			builder.WriteString(input)
-			break
-		}
-
-		builder.WriteString(input[:idx])
-		builder.WriteString(replacement)
-		input = input[idx+len(token):]
-		lowerInput = lowerInput[idx+len(token):]
-	}
-
-	return builder.String()
 }
 
 func filePath() (string, error) {

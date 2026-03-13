@@ -13,8 +13,7 @@ import (
 type TargetKind int
 
 const (
-	TargetUnknown TargetKind = iota
-	TargetKey
+	TargetKey TargetKind = iota + 1
 	TargetValue
 )
 
@@ -51,20 +50,6 @@ func PathExists(path string) (bool, error) {
 	default:
 		return false, nil
 	}
-}
-
-func KeyExists(path string) (bool, error) {
-	t, err := ResolveTarget(path)
-	if err == registry.ErrNotExist {
-		return false, nil
-	}
-	if err != nil {
-		return false, err
-	}
-	if t.Kind != TargetKey {
-		return false, nil
-	}
-	return keyPathExists(t.Root, t.KeyPath)
 }
 
 func ValidatePath(path string) error {

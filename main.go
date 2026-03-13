@@ -216,8 +216,8 @@ func resolveExplorerDirFromGlob(pathPattern string) (string, error) {
 		return "", fmt.Errorf("세이브 경로가 비어 있습니다")
 	}
 
-	if hasGlobWildcards(expanded) {
-		return fixedPrefixDir(expanded), nil
+	if pathutil.HasGlobWildcards(expanded) {
+		return pathutil.FixedPrefixPath(expanded), nil
 	}
 
 	info, err := os.Stat(expanded)
@@ -229,39 +229,6 @@ func resolveExplorerDirFromGlob(pathPattern string) (string, error) {
 	}
 
 	return filepath.Dir(expanded), nil
-}
-
-func hasGlobWildcards(path string) bool {
-	return strings.ContainsAny(path, "*?[{")
-}
-
-func fixedPrefixDir(pattern string) string {
-	clean := filepath.Clean(pattern)
-	volume := filepath.VolumeName(clean)
-	rest := strings.TrimPrefix(clean, volume)
-	rest = strings.TrimPrefix(rest, string(filepath.Separator))
-
-	parts := strings.Split(rest, string(filepath.Separator))
-	fixed := make([]string, 0, len(parts))
-	for _, p := range parts {
-		if strings.ContainsAny(p, "*?[{") {
-			break
-		}
-		fixed = append(fixed, p)
-	}
-
-	if len(fixed) == 0 {
-		if volume != "" {
-			return volume + string(filepath.Separator)
-		}
-		return string(filepath.Separator)
-	}
-
-	base := filepath.Join(fixed...)
-	if volume != "" {
-		return filepath.Join(volume+string(filepath.Separator), base)
-	}
-	return filepath.Join(string(filepath.Separator), base)
 }
 
 func (s *uiState) openManageWindow() {
@@ -695,38 +662,13 @@ func validateSaveLocationInput(loc model.SaveLocation) error {
 }
 
 func substituteKnownSavePathTokensForValidation(path string) string {
-	resolved := replaceTokenInsensitive(path, "{{steam-path}}", `C:\Program Files (x86)\Steam`)
-	resolved = replaceTokenInsensitive(resolved, "{{steam-userid}}", "steam-userid")
-	resolved = replaceTokenInsensitive(resolved, "{{steam-accountid}}", "steam-accountid")
-	resolved = replaceTokenInsensitive(resolved, "{{microsoftstore-userid}}", "microsoftstore-userid")
-	resolved = replaceTokenInsensitive(resolved, "{{rockstargameslauncher-userid}}", "rockstar-launcher-userid")
-	resolved = replaceTokenInsensitive(resolved, "{{ubisoftconnect-path}}", `C:\Ubisoft\Ubisoft Game Launcher`)
-	return replaceTokenInsensitive(resolved, "{{ubisoftconnect-userid}}", "ubisoft-userid")
-}
-
-func replaceTokenInsensitive(input, token, replacement string) string {
-	lowerInput := strings.ToLower(input)
-	lowerToken := strings.ToLower(token)
-
-	if !strings.Contains(lowerInput, lowerToken) {
-		return input
-	}
-
-	var builder strings.Builder
-	for {
-		idx := strings.Index(lowerInput, lowerToken)
-		if idx < 0 {
-			builder.WriteString(input)
-			break
-		}
-
-		builder.WriteString(input[:idx])
-		builder.WriteString(replacement)
-		input = input[idx+len(token):]
-		lowerInput = lowerInput[idx+len(token):]
-	}
-
-	return builder.String()
+	resolved := pathutil.ReplaceTokenInsensitive(path, "{{steam-path}}", `C:\Program Files (x86)\Steam`)
+	resolved = pathutil.ReplaceTokenInsensitive(resolved, "{{steam-userid}}", "steam-userid")
+	resolved = pathutil.ReplaceTokenInsensitive(resolved, "{{steam-accountid}}", "steam-accountid")
+	resolved = pathutil.ReplaceTokenInsensitive(resolved, "{{microsoftstore-userid}}", "microsoftstore-userid")
+	resolved = pathutil.ReplaceTokenInsensitive(resolved, "{{rockstargameslauncher-userid}}", "rockstar-launcher-userid")
+	resolved = pathutil.ReplaceTokenInsensitive(resolved, "{{ubisoftconnect-path}}", `C:\Ubisoft\Ubisoft Game Launcher`)
+	return pathutil.ReplaceTokenInsensitive(resolved, "{{ubisoftconnect-userid}}", "ubisoft-userid")
 }
 
 func applyColumnWidthsByRatio(table *widget.Table, baseWidths []float32, totalWidth float32) {

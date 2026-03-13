@@ -15,9 +15,6 @@ import (
 
 type Result struct {
 	ZipPath string
-	Matched int
-	Written int
-	Skipped int
 }
 
 func CreateZipBackup(loc model.SaveLocation, backupDir string) (Result, error) {
@@ -49,27 +46,24 @@ func CreateZipBackup(loc model.SaveLocation, backupDir string) (Result, error) {
 
 	zw := zip.NewWriter(zipFile)
 
-	baseRoot := fixedPrefixPath(resolvedPath)
+	baseRoot := pathutil.FixedPrefixPath(resolvedPath)
 	logicalPattern := normalizeLogicalPattern(loc.Path)
-	logicalPrefix := restoreLogicalTokens(fixedPrefixPath(logicalPattern))
-	if !hasGlobWildcards(logicalPattern) {
+	logicalPrefix := restoreLogicalTokens(pathutil.FixedPrefixPath(logicalPattern))
+	if !pathutil.HasGlobWildcards(logicalPattern) {
 		baseRoot = filepath.Dir(resolvedPath)
 		logicalPrefix = filepath.Dir(loc.Path)
 	}
 	written := 0
-	skipped := 0
 
 	for _, match := range matches {
 		info, err := os.Stat(match)
 		if err != nil {
-			skipped++
 			continue
 		}
 
 		if info.IsDir() {
 			err = filepath.Walk(match, func(path string, fi os.FileInfo, walkErr error) error {
 				if walkErr != nil {
-					skipped++
 					return nil
 				}
 				if fi.IsDir() {
@@ -105,9 +99,6 @@ func CreateZipBackup(loc model.SaveLocation, backupDir string) (Result, error) {
 
 	return Result{
 		ZipPath: zipPath,
-		Matched: len(matches),
-		Written: written,
-		Skipped: skipped,
 	}, nil
 }
 
@@ -130,35 +121,6 @@ func addFileToZip(zw *zip.Writer, srcPath, entryName string) error {
 	return nil
 }
 
-func fixedPrefixPath(pattern string) string {
-	clean := filepath.Clean(pattern)
-	volume := filepath.VolumeName(clean)
-	rest := strings.TrimPrefix(clean, volume)
-	rest = strings.TrimPrefix(rest, string(filepath.Separator))
-
-	parts := strings.Split(rest, string(filepath.Separator))
-	fixed := make([]string, 0, len(parts))
-	for _, p := range parts {
-		if strings.ContainsAny(p, "*?[{") {
-			break
-		}
-		fixed = append(fixed, p)
-	}
-
-	if len(fixed) == 0 {
-		if volume != "" {
-			return volume + string(filepath.Separator)
-		}
-		return string(filepath.Separator)
-	}
-
-	base := filepath.Join(fixed...)
-	if volume != "" {
-		return filepath.Join(volume+string(filepath.Separator), base)
-	}
-	return filepath.Join(string(filepath.Separator), base)
-}
-
 func archivePath(baseRoot, logicalPrefix, fullPath string) string {
 	rel, err := filepath.Rel(baseRoot, fullPath)
 	if err != nil || strings.HasPrefix(rel, "..") {
@@ -177,18 +139,14 @@ func archivePath(baseRoot, logicalPrefix, fullPath string) string {
 	return logicalPrefix + "/" + rel
 }
 
-func hasGlobWildcards(path string) bool {
-	return strings.ContainsAny(path, "*?[{")
-}
-
 func normalizeLogicalPattern(path string) string {
-	replaced := replaceTokenInsensitive(path, "{{steam-path}}", "__STEAM_PATH__")
-	replaced = replaceTokenInsensitive(replaced, "{{steam-userid}}", "__STEAM_USERID__")
-	replaced = replaceTokenInsensitive(replaced, "{{steam-accountid}}", "__STEAM_ACCOUNTID__")
-	replaced = replaceTokenInsensitive(replaced, "{{microsoftstore-userid}}", "__MICROSOFTSTORE_USERID__")
-	replaced = replaceTokenInsensitive(replaced, "{{rockstargameslauncher-userid}}", "__ROCKSTARGAMESLAUNCHER_USERID__")
-	replaced = replaceTokenInsensitive(replaced, "{{ubisoftconnect-path}}", "__UBISOFTCONNECT_PATH__")
-	return replaceTokenInsensitive(replaced, "{{ubisoftconnect-userid}}", "__UBISOFTCONNECT_USERID__")
+	replaced := pathutil.ReplaceTokenInsensitive(path, "{{steam-path}}", "__STEAM_PATH__")
+	replaced = pathutil.ReplaceTokenInsensitive(replaced, "{{steam-userid}}", "__STEAM_USERID__")
+	replaced = pathutil.ReplaceTokenInsensitive(replaced, "{{steam-accountid}}", "__STEAM_ACCOUNTID__")
+	replaced = pathutil.ReplaceTokenInsensitive(replaced, "{{microsoftstore-userid}}", "__MICROSOFTSTORE_USERID__")
+	replaced = pathutil.ReplaceTokenInsensitive(replaced, "{{rockstargameslauncher-userid}}", "__ROCKSTARGAMESLAUNCHER_USERID__")
+	replaced = pathutil.ReplaceTokenInsensitive(replaced, "{{ubisoftconnect-path}}", "__UBISOFTCONNECT_PATH__")
+	return pathutil.ReplaceTokenInsensitive(replaced, "{{ubisoftconnect-userid}}", "__UBISOFTCONNECT_USERID__")
 }
 
 func restoreLogicalTokens(path string) string {
@@ -199,29 +157,4 @@ func restoreLogicalTokens(path string) string {
 	replaced = strings.ReplaceAll(replaced, "__ROCKSTARGAMESLAUNCHER_USERID__", "{{rockstargameslauncher-userid}}")
 	replaced = strings.ReplaceAll(replaced, "__UBISOFTCONNECT_PATH__", "{{ubisoftconnect-path}}")
 	return strings.ReplaceAll(replaced, "__UBISOFTCONNECT_USERID__", "{{ubisoftconnect-userid}}")
-}
-
-func replaceTokenInsensitive(input, token, replacement string) string {
-	lowerInput := strings.ToLower(input)
-	lowerToken := strings.ToLower(token)
-
-	if !strings.Contains(lowerInput, lowerToken) {
-		return input
-	}
-
-	var builder strings.Builder
-	for {
-		idx := strings.Index(lowerInput, lowerToken)
-		if idx < 0 {
-			builder.WriteString(input)
-			break
-		}
-
-		builder.WriteString(input[:idx])
-		builder.WriteString(replacement)
-		input = input[idx+len(token):]
-		lowerInput = lowerInput[idx+len(token):]
-	}
-
-	return builder.String()
 }
