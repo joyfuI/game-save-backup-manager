@@ -19,8 +19,8 @@ const (
 	keySteamAccountID         = "steam_accountid"
 	keyMicrosoftStoreUserID   = "microsoftstore_userid"
 	keyRockstarLauncherUserID = "rockstargameslauncher_userid"
-	keyUbisoftConnectPath     = "ubisoft_connect_path"
-	keyUbisoftConnectUserID   = "ubisoft_connect_userid"
+	keyUbisoftConnectPath     = "ubisoftconnect_path"
+	keyUbisoftConnectUserID   = "ubisoftconnect_userid"
 
 	tokenSteamPath              = "{{steam-path}}"
 	tokenSteamUserID            = "{{steam-userid}}"

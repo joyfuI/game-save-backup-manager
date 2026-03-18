@@ -47,8 +47,8 @@
   - `steam_path`
   - `steam_userid`
   - `steam_accountid`
-  - `ubisoft_connect_path`
-  - `ubisoft_connect_userid`
+  - `ubisoftconnect_path`
+  - `ubisoftconnect_userid`
   - `rockstargameslauncher_userid`
   - `microsoftstore_userid`
 - ini가 없으면 시작 시 자동 생성.
