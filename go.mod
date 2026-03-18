@@ -4,8 +4,8 @@ go 1.25.0
 
 require (
 	fyne.io/fyne/v2 v2.7.3
-	golang.org/x/sys v0.41.0
-	modernc.org/sqlite v1.46.1
+	golang.org/x/sys v0.42.0
+	modernc.org/sqlite v1.47.0
 )
 
 require (
@@ -21,7 +21,7 @@ require (
 	github.com/fyne-io/oksvg v0.2.0 // indirect
 	github.com/go-gl/gl v0.0.0-20231021071112-07e5d0ea2e71 // indirect
 	github.com/go-gl/glfw/v3.3/glfw v0.0.0-20250301202403-da16c1255728 // indirect
-	github.com/go-text/render v0.2.0 // indirect
+	github.com/go-text/render v0.2.1 // indirect
 	github.com/go-text/typesetting v0.3.4 // indirect
 	github.com/godbus/dbus/v5 v5.2.2 // indirect
 	github.com/google/uuid v1.6.0 // indirect
@@ -41,12 +41,12 @@ require (
 	github.com/srwiley/rasterx v0.0.0-20220730225603-2ab79fcdd4ef // indirect
 	github.com/stretchr/testify v1.11.1 // indirect
 	github.com/yuin/goldmark v1.7.16 // indirect
-	golang.org/x/exp v0.0.0-20260218203240-3dfff04db8fa // indirect
-	golang.org/x/image v0.36.0 // indirect
-	golang.org/x/net v0.51.0 // indirect
-	golang.org/x/text v0.34.0 // indirect
+	golang.org/x/image v0.37.0 // indirect
+	golang.org/x/net v0.52.0 // indirect
+	golang.org/x/text v0.35.0 // indirect
+	golang.org/x/tools v0.43.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	modernc.org/libc v1.68.0 // indirect
+	modernc.org/libc v1.70.0 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
 	modernc.org/memory v1.11.0 // indirect
 )
