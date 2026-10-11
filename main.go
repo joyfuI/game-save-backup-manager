@@ -78,6 +78,7 @@ func main() {
 
 func (s *uiState) buildAndRun() {
 	guiApp := app.New()
+	guiApp.Settings().SetTheme(newSystemFontTheme())
 	window := guiApp.NewWindow("Game Save Backup Manager")
 	window.Resize(fyne.NewSize(430, 520))
 	s.window = window
