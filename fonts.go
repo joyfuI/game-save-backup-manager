@@ -39,7 +39,6 @@ func newSystemFontTheme() fyne.Theme {
 			continue
 		}
 
-		// shortcut: 가변 폰트는 기본 굵기를 사용하며, 굵기 구분이 필요하면 정적 폰트를 설치한다.
 		var resources [2]fyne.Resource
 		for i, weight := range []font.Weight{font.WeightNormal, font.WeightBold} {
 			fonts.SetQuery(fontscan.Query{

@@ -14,6 +14,7 @@ import (
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/dialog"
+	"fyne.io/fyne/v2/fontweight"
 	"fyne.io/fyne/v2/layout"
 	fynestorage "fyne.io/fyne/v2/storage"
 	"fyne.io/fyne/v2/widget"
@@ -79,6 +80,7 @@ func main() {
 func (s *uiState) buildAndRun() {
 	guiApp := app.New()
 	guiApp.Settings().SetTheme(newSystemFontTheme())
+	fontweight.Enable(guiApp)
 	window := guiApp.NewWindow("Game Save Backup Manager")
 	window.Resize(fyne.NewSize(430, 520))
 	s.window = window

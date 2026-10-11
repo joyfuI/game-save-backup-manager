@@ -4,10 +4,13 @@ go 1.26.0
 
 require (
 	fyne.io/fyne/v2 v2.8.1
+	fyne.io/fyne/v2/fontweight v0.0.0
 	github.com/go-text/typesetting v0.3.5
 	golang.org/x/sys v0.49.0
 	modernc.org/sqlite v1.60.1
 )
+
+replace fyne.io/fyne/v2/fontweight => ./internal/fontweight
 
 require (
 	fyne.io/systray v1.12.3-0.20260810170012-af4e8e793ec4 // indirect
