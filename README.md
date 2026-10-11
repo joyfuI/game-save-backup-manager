@@ -72,13 +72,17 @@ go run .
 
 ## 빌드
 
+Go 1.26 이상과 Fyne 빌드용 C 컴파일러가 필요합니다.
+
 ```powershell
 go build ./...
 # 패키징 검증(디버깅/로컬 확인)
 fyne package -os windows
+git restore -- FyneApp.toml
 
 # 배포 파일이 필요할 때
 fyne package -os windows -release
+git restore -- FyneApp.toml
 ```
 
 ## 산출물/아이콘

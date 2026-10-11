@@ -76,6 +76,11 @@
 - 메인 창 종료 시 열려 있는 DB 관리 창도 함께 닫음.
 
 ## 빌드/검증 절차
+
+- Go 1.26 이상과 Fyne 빌드용 C 컴파일러가 필요하며, 실행 환경은 Windows 10 이상.
+- SQLite 업데이트 시 `modernc.org/libc` 버전은 해당 SQLite 모듈의 `go.mod`와 정확히 일치시킴.
+- 의존성 변경 후 `go mod tidy`와 `go mod verify` 실행. 간접 의존성은 `go mod why -m`으로 사용 경로를 확인하고, 다른 OS나 의존성 테스트용 모듈도 유지.
+
 1. `go build ./...`
 2. 패키징 검증(로컬 확인): `fyne package -os windows`
    - 직후 `git restore -- FyneApp.toml`
@@ -83,6 +88,7 @@
    - 직후 `git restore -- FyneApp.toml`
 
 ## 환경 특이사항
+- PATH에서 MSYS2의 `go.exe`가 먼저 선택되면 `GOROOT` 오류가 발생할 수 있음. 검증 시 `C:\Program Files\Go\bin`을 PATH 맨 앞에 두어 정상 설치된 Go 사용.
 - 이 환경은 `go build`/`go list` 계열에서 캐시 경로 권한 이슈가 간헐적으로 발생.
 - 권한 문제로 실패하면 동일 명령을 권한 상승으로 재실행 시 통과되는 경우가 많음.
 - 현재 프로젝트는 Git 저장소.
