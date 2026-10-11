@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
-	"net/url"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -531,12 +530,7 @@ func (s *uiState) openSettingsDialog() {
 }
 
 func normalizeLocalPathFromURI(uriPath string) string {
-	decoded, err := url.PathUnescape(uriPath)
-	if err != nil {
-		decoded = uriPath
-	}
-
-	localPath := filepath.FromSlash(decoded)
+	localPath := filepath.FromSlash(uriPath)
 	if runtime.GOOS == "windows" && len(localPath) >= 3 && localPath[0] == '\\' && localPath[2] == ':' {
 		localPath = localPath[1:]
 	}
